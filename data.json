@@ -91,6 +91,14 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781468216144/400/400",
       "category": "pestanas_nuevas"
+    },
+    {
+      "id": 1781468232386,
+      "name": "Pestañas inferiores ",
+      "price": 2000,
+      "duration": "60 min",
+      "image": "https://picsum.photos/seed/s1781468232386/400/400",
+      "category": "pestanas_nuevas"
     }
   ],
   "gallery": []
