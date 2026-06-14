@@ -5,14 +5,6 @@
   "heroImage": "https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png",
   "services": [
     {
-      "id": 1781467863995,
-      "name": "Extensiones Volumen 3D",
-      "price": 3200,
-      "duration": "60 min",
-      "image": "https://picsum.photos/seed/s1781467863996/400/400",
-      "category": "pestanas_relleno"
-    },
-    {
       "id": 1781467892924,
       "name": "Volumen Ruso",
       "price": 4200,
