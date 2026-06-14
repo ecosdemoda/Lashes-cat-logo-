@@ -130,12 +130,9 @@
 
     let storeData = {}, isLoggedIn = false, bookingCart = [], fileSha = '';
     
-    // Categorías en la página principal
     let currentMainCat = 'pestanas';
     let currentSubCat = 'pestanas_relleno'; 
     let activeFilter = 'pestanas_relleno';
-    
-    // Categoría activa en el Admin
     let adminActiveCat = 'pestanas_relleno';
 
     const catNames = { 
@@ -225,7 +222,20 @@
       }
       g.innerHTML = '';
       filtered.forEach(s => {
-        g.innerHTML += `<div class="service-card shadow-md border border-sand/50 flex flex-col"><img src="${s.image}" class="w-full h-36 object-cover"><div class="p-3 flex-grow flex flex-col"><h3 class="font-display text-sm font-bold leading-tight mb-1">${s.name}</h3><p class="text-xs text-drift mb-2"><i class="far fa-clock mr-1"></i>${s.duration || '60 min'}</p><p class="text-sm font-bold mt-auto" style="color:var(--accent)">$${s.price}</p></div><button onclick="addService(${s.id})" class="w-full py-2 text-white text-xs font-bold active:scale-95 transition" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i>Agregar</button></div>`;
+        // Creamos la nota si existe
+        const descHtml = s.description ? `<p class="text-[11px] text-gray-500 mb-2 leading-tight"><i class="fas fa-check-circle text-fuchsia mr-1"></i>${s.description}</p>` : '';
+        
+        g.innerHTML += `
+        <div class="service-card shadow-md border border-sand/50 flex flex-col">
+          <img src="${s.image}" class="w-full h-36 object-cover">
+          <div class="p-3 flex-grow flex flex-col">
+            <h3 class="font-display text-sm font-bold leading-tight mb-1">${s.name}</h3>
+            <p class="text-xs text-drift mb-1"><i class="far fa-clock mr-1"></i>${s.duration || '60 min'}</p>
+            ${descHtml}
+            <p class="text-sm font-bold mt-auto" style="color:var(--accent)">$${s.price}</p>
+          </div>
+          <button onclick="addService(${s.id})" class="w-full py-2 text-white text-xs font-bold active:scale-95 transition" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i>Agregar</button>
+        </div>`;
       });
     }
 
@@ -244,7 +254,16 @@
       for(let h=9; h<18; h++) { const h12 = h > 12 ? h-12 : h; const ampm = h >= 12 ? 'PM' : 'AM'; sel.innerHTML += `<option value="${h}:00">${h12}:00 ${ampm}</option>`; sel.innerHTML += `<option value="${h}:30">${h12}:30 ${ampm}</option>`; }
     }
 
-    function addService(id) { const s = storeData.services.find(x => x.id === id); if(!s) return; const e = bookingCart.find(x => x.id === id); if(e) e.qty++; else bookingCart.push({id: s.id, name: s.name, price: s.price, qty: 1}); updateBookingBadge(); showToast('Servicio añadido', 'success'); }
+    function addService(id) { 
+      const s = storeData.services.find(x => x.id === id); 
+      if(!s) return; 
+      const e = bookingCart.find(x => x.id === id); 
+      if(e) e.qty++; 
+      // Guardamos también la descripción en el carrito para enviarla por WhatsApp
+      else bookingCart.push({id: s.id, name: s.name, price: s.price, description: s.description, qty: 1}); 
+      updateBookingBadge(); showToast('Servicio añadido', 'success'); 
+    }
+    
     function removeService(id) { bookingCart = bookingCart.filter(x => x.id !== id); updateBookingBadge(); renderBooking(); }
     function updateBookingBadge() { const t = bookingCart.reduce((s,i)=>s+i.qty,0); const b = document.getElementById('bookingBadge'); if(t>0){b.textContent=t;b.classList.remove('hidden');}else b.classList.add('hidden'); }
 
@@ -252,7 +271,11 @@
       const list = document.getElementById('bookingList'), form = document.getElementById('bookingForm'), empty = document.getElementById('bookingEmpty');
       if(bookingCart.length===0){ list.style.display='none'; form.style.display='none'; empty.style.display='block'; return; }
       empty.style.display='none'; list.style.display='block'; form.style.display='block'; list.innerHTML=''; let total=0;
-      bookingCart.forEach(i => { total+=i.price*i.qty; list.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm"><div><h4 class="font-bold text-sm">${i.name}</h4><p class="text-xs" style="color:var(--accent)">$${i.price} x ${i.qty}</p></div><div class="flex items-center gap-2"><button onclick="removeService(${i.id})" class="text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`; });
+      bookingCart.forEach(i => { 
+        total+=i.price*i.qty; 
+        const descHtml = i.description ? `<p class="text-[10px] text-drift"><i class="fas fa-check-circle mr-1"></i>${i.description}</p>` : '';
+        list.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm"><div class="flex-1 mr-2"><h4 class="font-bold text-sm">${i.name}</h4>${descHtml}<p class="text-xs mt-1" style="color:var(--accent)">$${i.price} x ${i.qty}</p></div><div class="flex items-center gap-2"><button onclick="removeService(${i.id})" class="text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`; 
+      });
       document.getElementById('bookingTotal').innerHTML = `<span class="text-drift text-sm">Total:</span> <span style="color:var(--accent)">$${total}</span>`;
     }
 
@@ -261,7 +284,12 @@
       if(!name || !phone || !muni || !time) { showToast('Completa todo', 'error'); return; }
       let msg = `💅 *Reserva - ${storeData.salonName}*\n\n👤 *Cliente:* ${name}\n📞 *Teléfono:* ${phone}\n📍 *Dirección:* ${muni}\n🕒 *Horario:* ${time}\n\n📋 *Servicios:*\n`;
       let total = 0;
-      bookingCart.forEach(i => { const sub = i.price * i.qty; total += sub; msg += `  • ${i.name} x${i.qty} - $${sub}\n`; });
+      bookingCart.forEach(i => { 
+        const sub = i.price * i.qty; total += sub; 
+        msg += `  • ${i.name} x${i.qty} - $${sub}\n`; 
+        // Agregar la nota al mensaje de WhatsApp si existe
+        if(i.description) msg += `    ✔️ _${i.description}_\n`; 
+      });
       msg += `\n💰 *Total: $${total}*`;
       window.open(`https://wa.me/${(storeData.phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
       bookingCart = []; updateBookingBadge(); renderBooking(); switchScreen('home');
@@ -294,11 +322,7 @@
     }
     async function saveAdminInfo() { storeData.salonName=document.getElementById('ai_name').value; storeData.address=document.getElementById('ai_addr').value; storeData.phone=document.getElementById('ai_phone').value; storeData.heroImage=document.getElementById('ai_img').value; try{await saveData(); renderHome();}catch(e){} }
 
-    // ==========================================
-    // ADMIN SERVICIOS (POR CATEGORÍAS)
-    // ==========================================
     function renderAdminServices(el) {
-      // 1. Renderizar pestañas de categoría
       let tabsHtml = '<div class="flex gap-2 overflow-x-auto pb-2 mb-4 tabs-scroll">';
       Object.keys(catNames).forEach(key => {
         const isActive = key === adminActiveCat ? 'bg-pink-900/50 text-pink-400 border-pink-400' : 'bg-adminCard text-gray-300 border-gray-600';
@@ -306,34 +330,26 @@
       });
       tabsHtml += '</div>';
 
-      // 2. Filtrar servicios de la categoría activa
       const filtered = storeData.services.filter(s => s.category === adminActiveCat);
-
-      // 3. Listar servicios
       let listHtml = '<div class="space-y-3">';
       if (filtered.length === 0) {
         listHtml += '<p class="text-center text-gray-500 text-sm py-4">No hay servicios aquí aún.</p>';
       } else {
         filtered.forEach(s => {
-          const originalIndex = storeData.services.indexOf(s); // Índice real para borrar
-          listHtml += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3 items-center"><img src="${s.image}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${s.name}</h4><p class="text-pink-400 text-xs">$${s.price} | ${s.duration}</p></div><button onclick="deleteService(${originalIndex})" class="text-red-400 text-xs p-2"><i class="fas fa-trash"></i></button></div>`;
+          const originalIndex = storeData.services.indexOf(s);
+          // Mostrar snippet de la descripción en el admin
+          const descSnippet = s.description ? `<p class="text-gray-400 text-[10px] mt-1 truncate"><i class="fas fa-check-circle mr-1"></i>${s.description}</p>` : '';
+          listHtml += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3 items-center"><img src="${s.image}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${s.name}</h4><p class="text-pink-400 text-xs">$${s.price} | ${s.duration}</p>${descSnippet}</div><button onclick="deleteService(${originalIndex})" class="text-red-400 text-xs p-2"><i class="fas fa-trash"></i></button></div>`;
         });
       }
       listHtml += '</div>';
-
-      // 4. Botón de agregar (pasa la categoría automáticamente)
       listHtml += `<button onclick="renderServiceForm('${adminActiveCat}')" class="w-full mt-4 py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i> Nuevo en ${catNames[adminActiveCat]}</button>`;
-
       el.innerHTML = tabsHtml + listHtml;
     }
 
-    function filterAdminServices(catId) {
-      adminActiveCat = catId;
-      renderAdminServices(document.getElementById('adminContent'));
-    }
+    function filterAdminServices(catId) { adminActiveCat = catId; renderAdminServices(document.getElementById('adminContent')); }
 
     function renderServiceForm(preselectedCat = 'pestanas_relleno') {
-      // Generar las opciones del select y pre-seleccionar la categoría actual
       let optionsHtml = '';
       Object.keys(catNames).forEach(key => {
         const selected = key === preselectedCat ? 'selected' : '';
@@ -344,20 +360,21 @@
         <button onclick="showAdminPage('services')" class="text-drift hover:text-white mb-4 inline-flex gap-2 text-sm"><i class="fas fa-arrow-left"></i> Volver</button>
         <h3 class="font-display text-lg font-bold mb-4">Nuevo Servicio</h3>
         <div class="space-y-3">
-          <input id="sv_name" placeholder="Nombre" class="admin-input">
+          <input id="sv_name" placeholder="Nombre del servicio" class="admin-input">
           <input id="sv_price" type="number" placeholder="Precio" class="admin-input">
           <input id="sv_dur" placeholder="Duración (Ej: 45 min)" class="admin-input">
           <select id="sv_cat" class="admin-input">${optionsHtml}</select>
+          <textarea id="sv_desc" placeholder="¿Qué incluye? (Ej: Esmalte tradicional, limado, cutícula)" class="admin-input" rows="3"></textarea>
           <input id="sv_img" placeholder="URL de imagen (GitHub Raw)" class="admin-input">
           <button onclick="saveService()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button>
         </div>`;
     }
 
     async function saveService() {
-      const name=document.getElementById('sv_name').value, price=Number(document.getElementById('sv_price').value), duration=document.getElementById('sv_dur').value, image=document.getElementById('sv_img').value, category=document.getElementById('sv_cat').value;
+      const name=document.getElementById('sv_name').value, price=Number(document.getElementById('sv_price').value), duration=document.getElementById('sv_dur').value, category=document.getElementById('sv_cat').value, description=document.getElementById('sv_desc').value.trim(), image=document.getElementById('sv_img').value;
       if(!name||!price) { showToast('Pon nombre y precio', 'error'); return; }
-      storeData.services.push({id:Date.now(), name, price, duration: duration||'60 min', image: image||'https://picsum.photos/seed/s'+Date.now()+'/400/400', category});
-      adminActiveCat = category; // Quedarse en la pestaña donde se guardó
+      storeData.services.push({id:Date.now(), name, price, duration: duration||'60 min', description, image: image||'https://picsum.photos/seed/s'+Date.now()+'/400/400', category});
+      adminActiveCat = category;
       try{await saveData(); showAdminPage('services'); renderHome();}catch(e){}
     }
     
@@ -367,9 +384,6 @@
       try{await saveData(); showAdminPage('services'); renderHome();}catch(e){} 
     }
 
-    // ==========================================
-    // ADMIN GALERÍA
-    // ==========================================
     function renderAdminGallery(el) {
       let h = '<h3 class="font-display font-bold text-pink-400 mb-4">Galería de Trabajos</h3><div class="space-y-3">';
       if(storeData.gallery && storeData.gallery.length > 0) {
@@ -401,4 +415,4 @@
     document.addEventListener('DOMContentLoaded', () => { initAuth(); initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-                                                                                                                                                                                         </html>
+  </html>
