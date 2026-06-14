@@ -115,6 +115,15 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781468272521/400/400",
       "category": "pestanas_nuevas"
+    },
+    {
+      "id": 1781469502496,
+      "name": "Pedicura Básica ",
+      "price": 1500,
+      "duration": "60 min",
+      "description": "-Limpieza y ablandamiento con sales y gel limpiador.\n-Extracción de células muertas y callosidades.\n-Pedicura rusa. \n-Decoración con pintura en gel.",
+      "image": "https://picsum.photos/seed/s1781469502496/400/400",
+      "category": "manicura"
     }
   ],
   "gallery": []
