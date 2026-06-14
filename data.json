@@ -142,6 +142,15 @@
       "description": "-Pedicura básica \n-Construcción y alargamiento de uñas con base Rubber o gel de construcción",
       "image": "https://picsum.photos/seed/s1781469665243/400/400",
       "category": "manicura"
+    },
+    {
+      "id": 1781470378639,
+      "name": "Cortas",
+      "price": 1000,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781470378639/400/400",
+      "category": "manicura_naturales"
     }
   ],
   "gallery": []
