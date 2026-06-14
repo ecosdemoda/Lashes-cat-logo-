@@ -1,12 +1,7 @@
 {
-  "storeName": "Lashes Salón",
-  "heroSubtitle": "Haciéndole lucir mas bella",
-  "heroTitle": "Lashes",
-  "backgroundColor": "#FFFAFC",
-  "headerColor": "#1A1A1A",
-  "accentColor": "#E91E8C",
-  "whatsappNumber": "53000000",
-  "exchangeRate": 300,
-  "shippingZones": [],
-  "sections": []
+  "salonName": "Lashes Catálogo",
+  "address": "La Habana, Cuba",
+  "phone": "53000000",
+  "heroImage": "https://picsum.photos/seed/salon/800/600",
+  "services": []
 }
