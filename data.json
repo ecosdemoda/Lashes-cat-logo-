@@ -187,6 +187,15 @@
       "description": "",
       "image": "https://picsum.photos/seed/s1781470433196/400/400",
       "category": "manicura_softgel"
+    },
+    {
+      "id": 1781470445339,
+      "name": "Largas",
+      "price": 3000,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781470445339/400/400",
+      "category": "manicura_softgel"
     }
   ],
   "gallery": []
