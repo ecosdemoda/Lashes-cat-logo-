@@ -99,6 +99,14 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781468232386/400/400",
       "category": "pestanas_nuevas"
+    },
+    {
+      "id": 1781468248321,
+      "name": "Extensiones de colores",
+      "price": 500,
+      "duration": "60 min",
+      "image": "https://picsum.photos/seed/s1781468248321/400/400",
+      "category": "pestanas_nuevas"
     }
   ],
   "gallery": []
