@@ -10,13 +10,7 @@
       theme: {
         extend: {
           colors: {
-            blush: '#FFF0F5',    // Fondo principal (Rosa muy pálido)
-            charcoal: '#1A1A1A', // Texto y contrastes (Negro elegante)
-            fuchsia: '#D6336C',  // Acentos y botones (Rosa fucsia intenso)
-            sand: '#FCE4EC',     // Bordes y fondos suaves (Rosa claro)
-            drift: '#6B7280',    // Texto secundario (Gris)
-            admin: '#111827', 
-            adminCard: '#1F2937'
+            blush: '#FFF0F5', charcoal: '#1A1A1A', fuchsia: '#D6336C', sand: '#FCE4EC', drift: '#6B7280', admin: '#111827', adminCard: '#1F2937'
           },
           fontFamily: { display: ['Playfair Display', 'serif'], body: ['Lato', 'sans-serif'] }
         }
@@ -58,14 +52,11 @@
   </nav>
 
   <main id="screenHome" class="pb-24">
-    <!-- HERO CON LOGO CENTRADO -->
     <div class="relative overflow-hidden bg-charcoal flex flex-col items-center justify-center p-6 pt-10 pb-8">
-      <!-- Reemplaza el src con tu URL de GitHub Raw cuando la tengas -->
-      <img id="heroLogo" src="https://z-cdn-media.chatglm.cn/files/8beb9a93-35f8-4f66-bade-2c533271e9a2.png?auth_key=1881465977-c10a196efae14199afd20198175b3b3d-0-40f0b0e685e7630b5a630e0599afe9b5" alt="Lashes Lashes Logo" class="w-40 h-40 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
+      <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo" class="w-40 h-40 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
       <h1 id="salonTitle" class="font-display text-3xl font-black text-white leading-tight text-center drop-shadow-md"></h1>
       <div class="flex items-center gap-2 text-white/80 text-sm mt-2 drop-shadow-sm"><i class="fas fa-map-marker-alt"></i><span id="salonAddress"></span></div>
     </div>
-
     <section class="px-4 py-6">
       <h2 class="font-display text-2xl font-bold mb-4">Nuestros Servicios</h2>
       <div id="servicesGrid" class="grid grid-cols-2 gap-3"></div>
@@ -86,8 +77,7 @@
     </div>
   </div>
 
-  <!-- LOGIN SEGURO -->
-  <div id="loginModal" class="modal-overlay"><div class="modal-box p-8 shadow-2xl"><h3 class="font-display text-xl font-bold mb-4 text-center">Acceso Admin</h3><div class="space-y-4"><p class="text-sm text-drift">Pega tu Token de GitHub. Se guardará en tu celular de forma segura.</p><input id="loginToken" type="password" class="admin-input border-sand bg-white text-charcoal" placeholder="ghp_..."><p id="loginError" class="text-red-500 text-sm hidden">Token incorrecto o sin permisos.</p><button type="button" onclick="handleLogin()" class="w-full py-3 rounded-xl font-bold text-white active:scale-95 transition" style="background:var(--accent)">Entrar</button><button type="button" onclick="closeAllModals()" class="w-full py-3 rounded-xl font-bold text-drift border border-sand">Cancelar</button></div></div></div>
+  <div id="loginModal" class="modal-overlay"><div class="modal-box p-8 shadow-2xl"><h3 class="font-display text-xl font-bold mb-4 text-center">Acceso Admin</h3><div class="space-y-4"><p class="text-sm text-drift">Pega tu Token de GitHub.</p><input id="loginToken" type="password" class="admin-input border-sand bg-white text-charcoal" placeholder="ghp_..."><p id="loginError" class="text-red-500 text-sm hidden">Token incorrecto o sin permisos.</p><button type="button" onclick="handleLogin()" class="w-full py-3 rounded-xl font-bold text-white active:scale-95 transition" style="background:var(--accent)">Entrar</button><button type="button" onclick="closeAllModals()" class="w-full py-3 rounded-xl font-bold text-drift border border-sand">Cancelar</button></div></div></div>
 
   <div id="adminModal" class="modal-overlay"><div class="modal-box bg-admin text-white flex flex-col shadow-2xl" style="height:100vh;max-height:100vh;border-radius:0;">
     <header class="p-4 border-b border-gray-700 flex justify-between items-center shrink-0"><h2 class="font-display text-lg font-bold" style="color:var(--accent)">Admin Salón</h2><button onclick="closeAllModals()" class="text-xl"><i class="fas fa-times"></i></button></header>
@@ -102,7 +92,6 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    // CONFIGURACIÓN (SIN TOKEN AQUÍ)
     const GITHUB_OWNER = 'ecosdemoda'; 
     const GITHUB_REPO = 'Lashes-cat-logo-';
     const GITHUB_BRANCH = 'main';
@@ -113,16 +102,28 @@
     let storeData = {}, isLoggedIn = false, bookingCart = [], fileSha = '';
 
     async function initApp() {
+      // 1. Intentar cargar desde GitHub
       try {
         const res = await fetch(RAW_URL + '?t=' + Date.now());
-        if (res.ok) storeData = await res.json();
-      } catch(e) { console.error(e); }
+        if (res.ok) {
+          const text = await res.text();
+          if(text) storeData = JSON.parse(text); // Evitar error si está vacío
+        }
+      } catch(e) { console.error("Error cargando GitHub, usando caché local", e); }
       
-      // Valores por defecto basados en tu logo
+      // 2. Si falló GitHub o estaba vacío, usar la caché local
+      if (Object.keys(storeData).length === 0) {
+        const cache = localStorage.getItem('lashes_store_cache');
+        if (cache) {
+          try { storeData = JSON.parse(cache); } catch(e) {}
+        }
+      }
+
+      // 3. Valores por defecto
       if (!storeData.salonName) storeData.salonName = 'Lashes Lashes';
       if (!storeData.address) storeData.address = 'La elegancia comienza por tu mirada';
-      
       if (!storeData.services) storeData.services = [];
+      
       renderHome(); generateTimeSlots();
     }
 
@@ -130,19 +131,30 @@
       try {
         const token = localStorage.getItem('gh_token_lashes'); if(!token) throw new Error("No Token");
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(storeData, null, 2))));
+        
+        // Obtener SHA actual (o manejar si el archivo no existe)
         const currentRes = await fetch(API_URL, { headers: { Authorization: `token ${token}` } });
-        if (currentRes.status === 401) { showToast('Token incorrecto o sin permisos', 'error'); throw new Error("Bad Token"); }
-        if (currentRes.status === 404) { showToast('Falta crear data.json en GitHub', 'error'); throw new Error("No file"); }
-        if(!currentRes.ok) throw new Error("Error SHA");
-        fileSha = (await currentRes.json()).sha;
+        let sha = '';
+        if (currentRes.status === 401) { showToast('Token sin permisos', 'error'); throw new Error("Bad Token"); }
+        if (currentRes.ok) { sha = (await currentRes.json()).sha; } 
+        // Si es 404, sha queda vacío y GitHub creará el archivo automáticamente
+        
         const putRes = await fetch(API_URL, {
           method: 'PUT', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: 'Actualizar salón', content, sha: fileSha, branch: GITHUB_BRANCH })
+          body: JSON.stringify({ message: 'Actualizar salón', content, sha: sha, branch: GITHUB_BRANCH })
         });
+        
         if(!putRes.ok) throw new Error("Error guardar");
         fileSha = (await putRes.json()).content.sha;
-        showToast('¡Guardado!', 'success');
-      } catch(e) { showToast('Error al guardar. ¿VPN?', 'error'); throw e; }
+        
+        // GUARDAR EN CACHÉ LOCAL (Para que no se borre al refrescar)
+        localStorage.setItem('lashes_store_cache', JSON.stringify(storeData));
+        
+        showToast('¡Guardado con éxito!', 'success');
+      } catch(e) { 
+        showToast('Error al guardar en GitHub', 'error'); 
+        console.error(e);
+      }
     }
 
     function initAuth() { isLoggedIn = !!localStorage.getItem('gh_token_lashes'); document.getElementById('navAdmin').querySelector('i').className = isLoggedIn ? 'fas fa-unlock' : 'fas fa-lock'; }
@@ -160,8 +172,10 @@
       document.getElementById('salonTitle').textContent = storeData.salonName || 'Lashes Lashes';
       document.getElementById('salonAddress').textContent = storeData.address || 'La elegancia comienza por tu mirada';
       
-      // Si en data.json hay una imagen custom, la pone. Si no, mantiene la que está en el HTML
-      if(storeData.heroImage) document.getElementById('heroLogo').src = storeData.heroImage;
+      // Sobreescribir el logo solo si hay uno guardado en data.json
+      if(storeData.heroImage) {
+        document.getElementById('heroLogo').src = storeData.heroImage;
+      }
 
       const g = document.getElementById('servicesGrid'); g.innerHTML = '';
       storeData.services.forEach(s => {
@@ -222,7 +236,7 @@
     }
 
     function renderAdminInfo(el) {
-      el.innerHTML = `<div class="space-y-4"><h3 class="font-display font-bold text-pink-400">Información del Salón</h3><div><label class="block text-xs text-gray-400 mb-1">Nombre</label><input id="ai_name" value="${storeData.salonName||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">Dirección / Slogan</label><input id="ai_addr" value="${storeData.address||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">WhatsApp (solo números)</label><input id="ai_phone" value="${storeData.phone||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">URL Imagen Logo (GitHub Raw URL)</label><input id="ai_img" value="${storeData.heroImage||''}" class="admin-input"></div><button onclick="saveAdminInfo()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button></div>`;
+      el.innerHTML = `<div class="space-y-4"><h3 class="font-display font-bold text-pink-400">Información del Salón</h3><div><label class="block text-xs text-gray-400 mb-1">Nombre</label><input id="ai_name" value="${storeData.salonName||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">Dirección / Slogan</label><input id="ai_addr" value="${storeData.address||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">WhatsApp (solo números)</label><input id="ai_phone" value="${storeData.phone||''}" class="admin-input"></div><div><label class="block text-xs text-gray-400 mb-1">URL Imagen Logo (Raw URL)</label><input id="ai_img" value="${storeData.heroImage||''}" class="admin-input"></div><button onclick="saveAdminInfo()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button></div>`;
     }
     async function saveAdminInfo() { storeData.salonName=document.getElementById('ai_name').value; storeData.address=document.getElementById('ai_addr').value; storeData.phone=document.getElementById('ai_phone').value; storeData.heroImage=document.getElementById('ai_img').value; try{await saveData(); renderHome();}catch(e){} }
 
@@ -246,4 +260,4 @@
     document.addEventListener('DOMContentLoaded', () => { initAuth(); initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-  </html>
+</html>
