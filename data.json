@@ -295,6 +295,15 @@
       "description": "",
       "image": "https://picsum.photos/seed/s1781471042546/400/400",
       "category": "depilacion"
+    },
+    {
+      "id": 1781471084267,
+      "name": "Depilación de barbilla ",
+      "price": 300,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781471084267/400/400",
+      "category": "depilacion"
     }
   ],
   "gallery": []
