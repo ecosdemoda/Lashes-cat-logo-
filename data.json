@@ -51,6 +51,14 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781467997300/400/400",
       "category": "pestanas_relleno"
+    },
+    {
+      "id": 1781468009958,
+      "name": "Retiro de extensiones ",
+      "price": 500,
+      "duration": "60 min",
+      "image": "https://picsum.photos/seed/s1781468009958/400/400",
+      "category": "pestanas_relleno"
     }
   ],
   "gallery": []
