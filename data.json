@@ -196,6 +196,15 @@
       "description": "",
       "image": "https://picsum.photos/seed/s1781470445339/400/400",
       "category": "manicura_softgel"
+    },
+    {
+      "id": 1781470491986,
+      "name": "Gel de rconstrucción  en uñas naturales ",
+      "price": 1500,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781470491986/400/400",
+      "category": "manicura_extension"
     }
   ],
   "gallery": []
