@@ -67,6 +67,14 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781468049483/400/400",
       "category": "pestanas_nuevas"
+    },
+    {
+      "id": 1781468172442,
+      "name": "Volumen Ruso",
+      "price": 4500,
+      "duration": "60 min",
+      "image": "https://picsum.photos/seed/s1781468172442/400/400",
+      "category": "pestanas_nuevas"
     }
   ],
   "gallery": []
