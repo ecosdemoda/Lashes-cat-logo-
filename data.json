@@ -295,6 +295,15 @@
       "description": "",
       "image": "https://picsum.photos/seed/s1781471128869/400/400",
       "category": "depilacion"
+    },
+    {
+      "id": 1781471177152,
+      "name": "Depilación de cejas ",
+      "price": 500,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781471177152/400/400",
+      "category": "depilacion"
     }
   ],
   "gallery": []
