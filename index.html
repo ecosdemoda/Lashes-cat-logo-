@@ -41,6 +41,17 @@
     .admin-input:focus { outline: none; border-color: #D6336C; }
     .badge { position: absolute; top: -5px; right: -5px; background: #D6336C; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .tabs-scroll { overflow-x: auto; scrollbar-width: none; } .tabs-scroll::-webkit-scrollbar { display: none; }
+    
+    /* Estilos Galería Collage */
+    #galleryGrid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 130px; gap: 6px; }
+    #galleryGrid .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    #galleryGrid .gallery-item { position: relative; border-radius: 12px; overflow: hidden; }
+    #galleryGrid .gallery-item img, #galleryGrid .gallery-item video { width: 100%; height: 100%; object-fit: cover; }
+    #galleryGrid .play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); color: white; font-size: 24px; pointer-events: none; }
+    
+    /* Categorías */
+    .cat-btn { transition: all 0.2s; border: 2px solid transparent; }
+    .cat-btn.active { background: white; border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(214, 51, 108, 0.15); }
   </style>
 </head>
 <body>
@@ -53,13 +64,38 @@
 
   <main id="screenHome" class="pb-24">
     <div class="relative overflow-hidden bg-charcoal flex flex-col items-center justify-center p-6 pt-10 pb-8">
-      <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo" class="w-40 h-40 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
+      <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo" class="w-36 h-36 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
       <h1 id="salonTitle" class="font-display text-3xl font-black text-white leading-tight text-center drop-shadow-md"></h1>
       <div class="flex items-center gap-2 text-white/80 text-sm mt-2 drop-shadow-sm"><i class="fas fa-map-marker-alt"></i><span id="salonAddress"></span></div>
     </div>
+
     <section class="px-4 py-6">
-      <h2 class="font-display text-2xl font-bold mb-4">Nuestros Servicios</h2>
+      <h2 class="font-display text-2xl font-bold mb-4">Servicios</h2>
+      
+      <!-- Tabs de Categorías -->
+      <div class="flex gap-2 overflow-x-auto pb-3 tabs-scroll mb-4">
+        <button onclick="filterCategory('pestanas')" class="cat-btn active flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="pestanas">
+          <i class="fas fa-eye"></i> Pestañas y Cejas
+        </button>
+        <button onclick="filterCategory('unas')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="unas">
+          <i class="fas fa-hand-sparkles"></i> Uñas
+        </button>
+        <button onclick="filterCategory('faciales')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="faciales">
+          <i class="fas fa-face-smile-beam"></i> Faciales
+        </button>
+      </div>
+
       <div id="servicesGrid" class="grid grid-cols-2 gap-3"></div>
+    </section>
+
+    <!-- Sección Galería / Portafolio -->
+    <section class="px-4 py-6">
+      <h2 class="font-display text-2xl font-bold mb-4">Nuestros Trabajos</h2>
+      <div id="galleryGrid"></div>
+      <div id="galleryEmpty" class="text-center py-8 hidden">
+        <i class="fas fa-camera-retro text-3xl text-sand mb-2"></i>
+        <p class="text-drift text-sm">Pronto subiremos nuestros mejores trabajos</p>
+      </div>
     </section>
   </main>
 
@@ -77,13 +113,14 @@
     </div>
   </div>
 
-  <div id="loginModal" class="modal-overlay"><div class="modal-box p-8 shadow-2xl"><h3 class="font-display text-xl font-bold mb-4 text-center">Acceso Admin</h3><div class="space-y-4"><p class="text-sm text-drift">Pega tu Token de GitHub.</p><input id="loginToken" type="password" class="admin-input border-sand bg-white text-charcoal" placeholder="ghp_..."><p id="loginError" class="text-red-500 text-sm hidden">Token incorrecto o sin permisos.</p><button type="button" onclick="handleLogin()" class="w-full py-3 rounded-xl font-bold text-white active:scale-95 transition" style="background:var(--accent)">Entrar</button><button type="button" onclick="closeAllModals()" class="w-full py-3 rounded-xl font-bold text-drift border border-sand">Cancelar</button></div></div></div>
+  <div id="loginModal" class="modal-overlay"><div class="modal-box p-8 shadow-2xl"><h3 class="font-display text-xl font-bold mb-4 text-center">Acceso Admin</h3><div class="space-y-4"><input id="loginToken" type="password" class="admin-input border-sand bg-white text-charcoal" placeholder="Tu Token de GitHub (ghp_...)"><p id="loginError" class="text-red-500 text-sm hidden">Token incorrecto o sin permisos.</p><button type="button" onclick="handleLogin()" class="w-full py-3 rounded-xl font-bold text-white active:scale-95 transition" style="background:var(--accent)">Entrar</button><button type="button" onclick="closeAllModals()" class="w-full py-3 rounded-xl font-bold text-drift border border-sand">Cancelar</button></div></div></div>
 
   <div id="adminModal" class="modal-overlay"><div class="modal-box bg-admin text-white flex flex-col shadow-2xl" style="height:100vh;max-height:100vh;border-radius:0;">
     <header class="p-4 border-b border-gray-700 flex justify-between items-center shrink-0"><h2 class="font-display text-lg font-bold" style="color:var(--accent)">Admin Salón</h2><button onclick="closeAllModals()" class="text-xl"><i class="fas fa-times"></i></button></header>
     <div class="flex gap-1 p-3 border-b border-gray-700 shrink-0 bg-adminCard/50 overflow-x-auto tabs-scroll">
       <button onclick="showAdminPage('info')" class="admin-tab px-3 py-2 rounded-lg text-xs font-bold text-gray-300 shrink-0" data-page="info"><i class="fas fa-store mr-1"></i> Info</button>
       <button onclick="showAdminPage('services')" class="admin-tab px-3 py-2 rounded-lg text-xs font-bold text-gray-300 shrink-0" data-page="services"><i class="fas fa-wand-magic-sparkles mr-1"></i> Servicios</button>
+      <button onclick="showAdminPage('gallery')" class="admin-tab px-3 py-2 rounded-lg text-xs font-bold text-gray-300 shrink-0" data-page="gallery"><i class="fas fa-images mr-1"></i> Galería</button>
     </div>
     <div id="adminContent" class="flex-1 overflow-y-auto p-5"></div>
     <footer class="p-3 border-t border-gray-700 shrink-0"><button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl hover:bg-red-900/30 text-red-400 font-bold"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button></footer>
@@ -100,61 +137,47 @@
     const API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
 
     let storeData = {}, isLoggedIn = false, bookingCart = [], fileSha = '';
+    let currentCategory = 'pestanas'; // Categoría inicial
 
     async function initApp() {
-      // 1. Intentar cargar desde GitHub
       try {
         const res = await fetch(RAW_URL + '?t=' + Date.now());
         if (res.ok) {
           const text = await res.text();
-          if(text) storeData = JSON.parse(text); // Evitar error si está vacío
+          if(text) storeData = JSON.parse(text);
         }
-      } catch(e) { console.error("Error cargando GitHub, usando caché local", e); }
+      } catch(e) { console.error(e); }
       
-      // 2. Si falló GitHub o estaba vacío, usar la caché local
       if (Object.keys(storeData).length === 0) {
         const cache = localStorage.getItem('lashes_store_cache');
-        if (cache) {
-          try { storeData = JSON.parse(cache); } catch(e) {}
-        }
+        if (cache) try { storeData = JSON.parse(cache); } catch(e) {}
       }
 
-      // 3. Valores por defecto
       if (!storeData.salonName) storeData.salonName = 'Lashes Lashes';
       if (!storeData.address) storeData.address = 'La elegancia comienza por tu mirada';
       if (!storeData.services) storeData.services = [];
+      if (!storeData.gallery) storeData.gallery = [];
       
-      renderHome(); generateTimeSlots();
+      renderHome(); generateTimeSlots(); renderGallery();
     }
 
     async function saveData() {
       try {
         const token = localStorage.getItem('gh_token_lashes'); if(!token) throw new Error("No Token");
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(storeData, null, 2))));
-        
-        // Obtener SHA actual (o manejar si el archivo no existe)
         const currentRes = await fetch(API_URL, { headers: { Authorization: `token ${token}` } });
         let sha = '';
         if (currentRes.status === 401) { showToast('Token sin permisos', 'error'); throw new Error("Bad Token"); }
         if (currentRes.ok) { sha = (await currentRes.json()).sha; } 
-        // Si es 404, sha queda vacío y GitHub creará el archivo automáticamente
-        
         const putRes = await fetch(API_URL, {
           method: 'PUT', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: 'Actualizar salón', content, sha: sha, branch: GITHUB_BRANCH })
         });
-        
         if(!putRes.ok) throw new Error("Error guardar");
         fileSha = (await putRes.json()).content.sha;
-        
-        // GUARDAR EN CACHÉ LOCAL (Para que no se borre al refrescar)
         localStorage.setItem('lashes_store_cache', JSON.stringify(storeData));
-        
         showToast('¡Guardado con éxito!', 'success');
-      } catch(e) { 
-        showToast('Error al guardar en GitHub', 'error'); 
-        console.error(e);
-      }
+      } catch(e) { showToast('Error al guardar en GitHub', 'error'); }
     }
 
     function initAuth() { isLoggedIn = !!localStorage.getItem('gh_token_lashes'); document.getElementById('navAdmin').querySelector('i').className = isLoggedIn ? 'fas fa-unlock' : 'fas fa-lock'; }
@@ -169,17 +192,50 @@
     function handleLogout() { localStorage.removeItem('gh_token_lashes'); isLoggedIn=false; initAuth(); closeAllModals(); }
 
     function renderHome() {
-      document.getElementById('salonTitle').textContent = storeData.salonName || 'Lashes Lashes';
-      document.getElementById('salonAddress').textContent = storeData.address || 'La elegancia comienza por tu mirada';
+      document.getElementById('salonTitle').textContent = storeData.salonName;
+      document.getElementById('salonAddress').textContent = storeData.address;
+      if(storeData.heroImage) document.getElementById('heroLogo').src = storeData.heroImage;
+      renderServices(); // Llama a la nueva función
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+      renderServices();
+    }
+
+    function renderServices() {
+      const g = document.getElementById('servicesGrid');
+      const filtered = storeData.services.filter(s => s.category === currentCategory);
       
-      // Sobreescribir el logo solo si hay uno guardado en data.json
-      if(storeData.heroImage) {
-        document.getElementById('heroLogo').src = storeData.heroImage;
+      if (filtered.length === 0) {
+        g.innerHTML = `<div class="col-span-2 flex flex-col items-center justify-center py-12 text-center">
+          <i class="fas fa-hourglass-half text-4xl text-sand mb-3"></i>
+          <h3 class="font-display text-2xl font-bold text-fuchsia mb-2">Muy Pronto</h3>
+          <p class="text-drift text-sm">Estamos preparando servicios increíbles para ti en esta categoría.</p>
+        </div>`;
+        return;
       }
 
-      const g = document.getElementById('servicesGrid'); g.innerHTML = '';
-      storeData.services.forEach(s => {
+      g.innerHTML = '';
+      filtered.forEach(s => {
         g.innerHTML += `<div class="service-card shadow-md border border-sand/50 flex flex-col"><img src="${s.image}" class="w-full h-36 object-cover"><div class="p-3 flex-grow flex flex-col"><h3 class="font-display text-sm font-bold leading-tight mb-1">${s.name}</h3><p class="text-xs text-drift mb-2"><i class="far fa-clock mr-1"></i>${s.duration || '60 min'}</p><p class="text-sm font-bold mt-auto" style="color:var(--accent)">$${s.price}</p></div><button onclick="addService(${s.id})" class="w-full py-2 text-white text-xs font-bold active:scale-95 transition" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i>Agregar</button></div>`;
+      });
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      const empty = document.getElementById('galleryEmpty');
+      if(!storeData.gallery || storeData.gallery.length === 0) {
+        grid.innerHTML = ''; empty.classList.remove('hidden'); return;
+      }
+      empty.classList.add('hidden'); grid.innerHTML = '';
+      storeData.gallery.forEach(item => {
+        if(item.type === 'video') {
+          grid.innerHTML += `<div class="gallery-item"><video src="${item.url}" autoplay loop muted playsinline></video><div class="play-icon"><i class="fas fa-play"></i></div></div>`;
+        } else {
+          grid.innerHTML += `<div class="gallery-item"><img src="${item.url}" alt="Trabajo realizado"></div>`;
+        }
       });
     }
 
@@ -232,7 +288,9 @@
     function showAdminPage(pg) {
       document.querySelectorAll('.admin-tab').forEach(b => { b.classList.toggle('bg-pink-900/30', b.dataset.page===pg); b.classList.toggle('text-pink-400', b.dataset.page===pg); b.classList.toggle('text-gray-300', b.dataset.page!==pg); });
       const c = document.getElementById('adminContent');
-      if(pg==='info') renderAdminInfo(c); else if(pg==='services') renderAdminServices(c);
+      if(pg==='info') renderAdminInfo(c); 
+      else if(pg==='services') renderAdminServices(c); 
+      else if(pg==='gallery') renderAdminGallery(c);
     }
 
     function renderAdminInfo(el) {
@@ -242,22 +300,53 @@
 
     function renderAdminServices(el) {
       let h = '<div class="space-y-3">';
-      storeData.services.forEach((s,i) => { h += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3"><img src="${s.image}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${s.name}</h4><p class="text-pink-400 text-xs">$${s.price} | ${s.duration}</p></div><button onclick="deleteService(${i})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button></div>`; });
+      storeData.services.forEach((s,i) => { h += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3"><img src="${s.image}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><h4 class="font-bold text-sm">${s.name}</h4><p class="text-pink-400 text-xs">$${s.price} | ${s.duration} | Cat: ${s.category||'Sin cat'}</p></div><button onclick="deleteService(${i})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button></div>`; });
       h += `</div><button onclick="renderServiceForm()" class="w-full mt-4 py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i> Nuevo Servicio</button>`;
       el.innerHTML = h;
     }
+    
     function renderServiceForm() {
-      document.getElementById('adminContent').innerHTML = `<button onclick="showAdminPage('services')" class="text-drift hover:text-white mb-4 inline-flex gap-2 text-sm"><i class="fas fa-arrow-left"></i> Volver</button><h3 class="font-display text-lg font-bold mb-4">Nuevo Servicio</h3><div class="space-y-3"><input id="sv_name" placeholder="Nombre" class="admin-input"><input id="sv_price" type="number" placeholder="Precio" class="admin-input"><input id="sv_dur" placeholder="Duración (Ej: 45 min)" class="admin-input"><input id="sv_img" placeholder="URL de imagen (GitHub Raw)" class="admin-input"><button onclick="saveService()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button></div>`;
+      document.getElementById('adminContent').innerHTML = `<button onclick="showAdminPage('services')" class="text-drift hover:text-white mb-4 inline-flex gap-2 text-sm"><i class="fas fa-arrow-left"></i> Volver</button><h3 class="font-display text-lg font-bold mb-4">Nuevo Servicio</h3><div class="space-y-3"><input id="sv_name" placeholder="Nombre" class="admin-input"><input id="sv_price" type="number" placeholder="Precio" class="admin-input"><input id="sv_dur" placeholder="Duración (Ej: 45 min)" class="admin-input"><select id="sv_cat" class="admin-input"><option value="pestanas">Pestañas y Cejas</option><option value="unas">Manicura y Pedicura</option><option value="faciales">Faciales</option></select><input id="sv_img" placeholder="URL de imagen (GitHub Raw)" class="admin-input"><button onclick="saveService()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button></div>`;
     }
     async function saveService() {
-      const name=document.getElementById('sv_name').value, price=Number(document.getElementById('sv_price').value), duration=document.getElementById('sv_dur').value, image=document.getElementById('sv_img').value;
+      const name=document.getElementById('sv_name').value, price=Number(document.getElementById('sv_price').value), duration=document.getElementById('sv_dur').value, image=document.getElementById('sv_img').value, category=document.getElementById('sv_cat').value;
       if(!name||!price) { showToast('Pon nombre y precio', 'error'); return; }
-      storeData.services.push({id:Date.now(), name, price, duration: duration||'60 min', image: image||'https://picsum.photos/seed/s'+Date.now()+'/400/400'});
+      storeData.services.push({id:Date.now(), name, price, duration: duration||'60 min', image: image||'https://picsum.photos/seed/s'+Date.now()+'/400/400', category});
       try{await saveData(); showAdminPage('services'); renderHome();}catch(e){}
     }
     async function deleteService(index) { if(!confirm('¿Eliminar?')) return; storeData.services.splice(index,1); try{await saveData(); showAdminPage('services'); renderHome();}catch(e){} }
 
+    // ADMIN GALERÍA
+    function renderAdminGallery(el) {
+      let h = '<h3 class="font-display font-bold text-pink-400 mb-4">Galería de Trabajos</h3><div class="space-y-3">';
+      if(storeData.gallery && storeData.gallery.length > 0) {
+        storeData.gallery.forEach((item, i) => {
+          h += `<div class="bg-adminCard p-2 rounded-xl border border-gray-700 flex gap-3 items-center">`;
+          if(item.type === 'video') h += `<i class="fas fa-video text-pink-400 text-lg ml-2"></i>`;
+          else h += `<img src="${item.url}" class="w-14 h-14 rounded-lg object-cover">`;
+          h += `<div class="flex-1 text-xs text-gray-300 truncate">${item.url}</div><button onclick="deleteGalleryItem(${i})" class="text-red-400 text-xs p-2"><i class="fas fa-trash"></i></button></div>`;
+        });
+      }
+      h += `</div><button onclick="renderGalleryForm()" class="w-full mt-4 py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i> Agregar Foto/Video</button>`;
+      el.innerHTML = h;
+    }
+
+    function renderGalleryForm() {
+      document.getElementById('adminContent').innerHTML = `<button onclick="showAdminPage('gallery')" class="text-drift hover:text-white mb-4 inline-flex gap-2 text-sm"><i class="fas fa-arrow-left"></i> Volver</button><h3 class="font-display text-lg font-bold mb-4">Agregar a Galería</h3><div class="space-y-3"><input id="gal_url" placeholder="URL de la imagen o video (GitHub Raw)" class="admin-input"><select id="gal_type" class="admin-input"><option value="image">Imagen</option><option value="video">Video</option></select><button onclick="saveGalleryItem()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar</button></div>`;
+    }
+
+    async function saveGalleryItem() {
+      const url = document.getElementById('gal_url').value.trim();
+      const type = document.getElementById('gal_type').value;
+      if(!url) { showToast('Pon la URL', 'error'); return; }
+      if(!storeData.gallery) storeData.gallery = [];
+      storeData.gallery.push({ id: Date.now(), url, type });
+      try{ await saveData(); showAdminPage('gallery'); renderGallery(); }catch(e){}
+    }
+
+    async function deleteGalleryItem(index) { if(!confirm('¿Eliminar de la galería?')) return; storeData.gallery.splice(index,1); try{await saveData(); showAdminPage('gallery'); renderGallery();}catch(e){} }
+
     document.addEventListener('DOMContentLoaded', () => { initAuth(); initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-</html>
+  </html>
