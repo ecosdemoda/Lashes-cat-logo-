@@ -205,6 +205,15 @@
       "description": "",
       "image": "https://picsum.photos/seed/s1781470491986/400/400",
       "category": "manicura_extension"
+    },
+    {
+      "id": 1781470523965,
+      "name": "Extensión de uñas cortas",
+      "price": 2000,
+      "duration": "60 min",
+      "description": "",
+      "image": "https://picsum.photos/seed/s1781470523965/400/400",
+      "category": "manicura_extension"
     }
   ],
   "gallery": []
