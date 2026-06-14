@@ -59,6 +59,14 @@
       "duration": "60 min",
       "image": "https://picsum.photos/seed/s1781468009958/400/400",
       "category": "pestanas_relleno"
+    },
+    {
+      "id": 1781468049483,
+      "name": "Volumen 3D",
+      "price": 3500,
+      "duration": "60 min",
+      "image": "https://picsum.photos/seed/s1781468049483/400/400",
+      "category": "pestanas_nuevas"
     }
   ],
   "gallery": []
