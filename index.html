@@ -114,7 +114,6 @@
     </section>
   </main>
 
-  <!-- SECCIÓN DE TURNO MODIFICADA (Sin campo de Dirección) -->
   <div id="screenBooking" class="pb-24 px-4 pt-6" style="display:none;">
     <h2 class="font-display text-2xl font-bold mb-4">Reservar Turno</h2>
     <div id="bookingEmpty" class="text-center py-12"><i class="fas fa-calendar-xmark text-4xl text-sand mb-3"></i><p class="text-drift text-sm">No has seleccionado servicios</p></div>
@@ -313,7 +312,6 @@
       document.getElementById('bookingTotal').innerHTML = `<span class="text-drift text-sm">Total:</span> <span style="color:var(--accent)">$${total}</span>`;
     }
 
-    // FUNCIÓN DE WHATSAPP MODIFICADA (Sin Dirección)
     function sendBooking() {
       const name = document.getElementById('bookName').value.trim(), phone = document.getElementById('bookPhone').value.trim(), time = document.getElementById('bookTime').value;
       if(!name || !phone || !time) { showToast('Completa todo', 'error'); return; }
@@ -438,14 +436,24 @@
       await fetchStoreData(); showAdminPage('services'); renderHome(); showToast('Eliminado', 'success');
     }
 
+    // --- GALERÍA (MODIFICADA PARA MOSTRAR NOMBRE) ---
     function renderAdminGallery(el) {
       let h = '<h3 class="font-display font-bold text-pink-400 mb-4">Galería de Trabajos</h3><div class="space-y-3">';
       if(storeData.gallery && storeData.gallery.length > 0) {
         storeData.gallery.forEach(item => {
-          h += `<div class="bg-adminCard p-2 rounded-xl border border-gray-700 flex gap-3 items-center">`;
-          if(item.type === 'video') h += `<i class="fas fa-video text-pink-400 text-lg ml-2"></i>`;
-          else h += `<img src="${item.url}" class="w-14 h-14 rounded-lg object-cover">`;
-          h += `<div class="flex-1 text-xs text-gray-300 truncate">${item.type}</div><button onclick="deleteGalleryItem(${item.id})" class="text-red-400 text-xs p-2"><i class="fas fa-trash"></i></button></div>`;
+          // Mostramos el nombre del archivo o un texto por defecto
+          const displayName = item.name || 'Archivo sin nombre'; 
+          const icon = item.type === 'video' ? 'fa-video' : 'fa-image';
+          const preview = item.type === 'video' ? `<div class="w-20 h-20 rounded-lg bg-adminCard flex items-center justify-center shrink-0"><i class="fas ${icon} text-pink-400 text-2xl"></i></div>` : `<img src="${item.url}" class="w-20 h-20 rounded-lg object-cover shrink-0">`;
+          
+          h += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3 items-center">
+            ${preview}
+            <div class="flex-1 overflow-hidden">
+              <p class="text-sm font-bold text-white truncate">${displayName}</p>
+              <p class="text-[10px] text-gray-500 uppercase">${item.type}</p>
+            </div>
+            <button onclick="deleteGalleryItem(${item.id})" class="text-red-400 text-lg p-2 shrink-0 hover:bg-red-900/30 rounded-lg"><i class="fas fa-trash"></i></button>
+          </div>`;
         });
       }
       h += `</div><button onclick="renderGalleryForm()" class="w-full mt-4 py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i> Agregar Foto/Video</button>`;
@@ -462,7 +470,9 @@
       showToast('Subiendo archivo...', 'info');
       const url = await uploadImage(file);
       if(url) {
-        const { error } = await supabaseClient.from('gallery').insert({ url, type });
+        // Capturamos el nombre original del archivo para guardarlo en la BD
+        const originalName = file.name;
+        const { error } = await supabaseClient.from('gallery').insert({ url, type, name: originalName });
         if(!error) { await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('¡Agregado!', 'success'); }
         else { showToast('Error en BD', 'error'); console.error(error); }
       }
@@ -479,4 +489,4 @@
     document.addEventListener('DOMContentLoaded', () => { initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-  </html>
+        </html>
