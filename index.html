@@ -47,13 +47,9 @@
     #galleryGrid .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
     #galleryGrid .gallery-item { position: relative; border-radius: 12px; overflow: hidden; }
     #galleryGrid .gallery-item img, #galleryGrid .gallery-item video { width: 100%; height: 100%; object-fit: cover; }
-    #galleryGrid .play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); color: white; font-size: 24px; pointer-events: none; }
-    
-    .cat-btn { transition: all 0.2s; border: 2px solid transparent; }
-    .cat-btn.active { background: white; border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(214, 51, 108, 0.15); }
-    .subcat-btn { transition: all 0.2s; border: 1.5px solid var(--accent); color: var(--accent); background: transparent; }
-    .subcat-btn.active { background: var(--accent); color: white; }
-    .sort-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    /* Estilo para el ícono de play que se desvanece */
+    #galleryGrid .play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); color: white; font-size: 24px; pointer-events: none; transition: opacity 0.3s; }
+    #galleryGrid .play-icon.hidden-play { opacity: 0; background: transparent; }
   </style>
 </head>
 <body>
@@ -288,14 +284,43 @@
       });
     }
 
+    // --- GALERÍA PÚBLICA (REPRODUCCIÓN INTELIGENTE) ---
     function renderGallery() {
       const grid = document.getElementById('galleryGrid'); const empty = document.getElementById('galleryEmpty');
       if(!storeData.gallery || storeData.gallery.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
       empty.classList.add('hidden'); grid.innerHTML = '';
       storeData.gallery.forEach(item => {
-        if(item.type === 'video') grid.innerHTML += `<div class="gallery-item"><video src="${item.url}" autoplay loop muted playsinline></video><div class="play-icon"><i class="fas fa-play"></i></div></div>`;
+        if(item.type === 'video') {
+          // Nota: quitamos 'autoplay'. El observer lo hará iniciar.
+          grid.innerHTML += `<div class="gallery-item"><video src="${item.url}" loop muted playsinline class="gallery-video"></video><div class="play-icon"><i class="fas fa-play"></i></div></div>`;
+        }
         else grid.innerHTML += `<div class="gallery-item"><img src="${item.url}" alt="Trabajo realizado"></div>`;
       });
+      setupVideoObservers();
+    }
+
+    function setupVideoObservers() {
+      const videos = document.querySelectorAll('.gallery-video');
+      if(videos.length === 0) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const video = entry.target;
+          const playIcon = video.nextElementSibling; // El ícono de play
+          if (entry.isIntersecting) {
+            // El video está en pantalla: reproducir y ocultar ícono
+            video.play().then(() => {
+              if(playIcon) playIcon.classList.add('hidden-play');
+            }).catch(err => console.log("Autoplay bloqueado por el navegador"));
+          } else {
+            // El video salió de pantalla: pausar y mostrar ícono
+            video.pause();
+            if(playIcon) playIcon.classList.remove('hidden-play');
+          }
+        });
+      }, { threshold: 0.5 }); // Se activa cuando el 50% del video es visible
+
+      videos.forEach(video => observer.observe(video));
     }
 
     function generateTimeSlots() { const sel = document.getElementById('bookTime'); for(let h=9; h<18; h++) { const h12 = h > 12 ? h-12 : h; const ampm = h >= 12 ? 'PM' : 'AM'; sel.innerHTML += `<option value="${h}:00">${h12}:00 ${ampm}</option>`; sel.innerHTML += `<option value="${h}:30">${h12}:30 ${ampm}</option>`; } }
@@ -436,12 +461,10 @@
       await fetchStoreData(); showAdminPage('services'); renderHome(); showToast('Eliminado', 'success');
     }
 
-    // --- GALERÍA (MODIFICADA PARA MOSTRAR NOMBRE) ---
     function renderAdminGallery(el) {
       let h = '<h3 class="font-display font-bold text-pink-400 mb-4">Galería de Trabajos</h3><div class="space-y-3">';
       if(storeData.gallery && storeData.gallery.length > 0) {
         storeData.gallery.forEach(item => {
-          // Mostramos el nombre del archivo o un texto por defecto
           const displayName = item.name || 'Archivo sin nombre'; 
           const icon = item.type === 'video' ? 'fa-video' : 'fa-image';
           const preview = item.type === 'video' ? `<div class="w-20 h-20 rounded-lg bg-adminCard flex items-center justify-center shrink-0"><i class="fas ${icon} text-pink-400 text-2xl"></i></div>` : `<img src="${item.url}" class="w-20 h-20 rounded-lg object-cover shrink-0">`;
@@ -470,7 +493,6 @@
       showToast('Subiendo archivo...', 'info');
       const url = await uploadImage(file);
       if(url) {
-        // Capturamos el nombre original del archivo para guardarlo en la BD
         const originalName = file.name;
         const { error } = await supabaseClient.from('gallery').insert({ url, type, name: originalName });
         if(!error) { await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('¡Agregado!', 'success'); }
@@ -489,4 +511,4 @@
     document.addEventListener('DOMContentLoaded', () => { initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-        </html>
+  </html>
