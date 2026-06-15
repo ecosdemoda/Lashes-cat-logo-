@@ -66,7 +66,8 @@
 
   <main id="screenHome" class="pb-24">
     <div class="relative overflow-hidden bg-charcoal flex flex-col items-center justify-center p-6 pt-10 pb-8">
-      <img id="heroLogo" src="" alt="Lashes Lashes Logo" class="w-36 h-36 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
+      <!-- AQUÍ ESTÁ TU LOGO DE GITHUB RESTAURADO -->
+      <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo" class="w-36 h-36 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1">
       <h1 id="salonTitle" class="font-display text-3xl font-black text-white leading-tight text-center drop-shadow-md"></h1>
       <div class="flex items-center gap-2 text-white/80 text-sm mt-2 drop-shadow-sm"><i class="fas fa-map-marker-alt"></i><span id="salonAddress"></span></div>
     </div>
@@ -147,10 +148,16 @@
     // ============== CONFIGURACIÓN SUPABASE ==============
     const SUPABASE_URL = 'https://ffomjyaiuingmdysutrw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmb21qeWFpdWluZ21keXN1dHJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjMyMDYsImV4cCI6MjA5NzAzOTIwNn0.itXgviHivbFUiocrAqJSyhFgufqJcvPIJratJIQM4nA';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let supabaseClient;
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+        console.error("Error inicializando Supabase:", e);
+    }
     // ====================================================
 
-    let storeData = { salonName: '', address: '', phone: '', services: [], gallery: [] };
+    let storeData = { salonName: 'Lashes Lashes', address: 'La elegancia comienza por tu mirada', phone: '', services: [], gallery: [] };
     let isLoggedIn = false, bookingCart = [];
     
     let currentMainCat = 'pestanas';
@@ -177,61 +184,67 @@
     }
 
     async function fetchStoreData() {
+      if (!supabaseClient) return;
       try {
-        const { data: info } = await supabase.from('salon_info').select('*').eq('id', 1).single();
-        if(info) { storeData.salonName = info.name; storeData.address = info.address; storeData.phone = info.phone; storeData.logo_url = info.logo_url; }
+        const { data: info, error: err1 } = await supabaseClient.from('salon_info').select('*').eq('id', 1).single();
+        if(err1) console.warn("Error salon_info:", err1.message);
+        if(info) { storeData.salonName = info.name; storeData.address = info.address; storeData.phone = info.phone; if(info.logo_url) storeData.logo_url = info.logo_url; }
         
-        const { data: servs } = await supabase.from('services').select('*').order('name', { ascending: true });
+        const { data: servs, error: err2 } = await supabaseClient.from('services').select('*').order('name', { ascending: true });
+        if(err2) console.warn("Error services:", err2.message);
         if(servs) storeData.services = servs;
 
-        const { data: gals } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+        const { data: gals, error: err3 } = await supabaseClient.from('gallery').select('*').order('created_at', { ascending: false });
+        if(err3) console.warn("Error gallery:", err3.message);
         if(gals) storeData.gallery = gals;
-      } catch(e) { console.error(e); }
+      } catch(e) { console.error("Fetch error:", e); }
     }
 
     // ============== SUBIDA DE IMÁGENES ==============
     async function uploadImage(file) {
-      if(!file) return null;
+      if(!file || !supabaseClient) return null;
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `productos/${fileName}`;
       
-      const { data, error } = await supabase.storage.from('imagenes').upload(filePath, file, { cacheControl: '3600', upsert: false });
+      const { data, error } = await supabaseClient.storage.from('imagenes').upload(filePath, file, { cacheControl: '3600', upsert: false });
       if (error) { showToast('Error subiendo imagen', 'error'); console.error(error); return null; }
       
-      const { data: publicUrlData } = supabase.storage.from('imagenes').getPublicUrl(filePath);
+      const { data: publicUrlData } = supabaseClient.storage.from('imagenes').getPublicUrl(filePath);
       return publicUrlData.publicUrl;
     }
 
     async function deleteImage(url) {
-      if(!url) return;
+      if(!url || !supabaseClient) return;
       try {
         const parts = url.split('/imagenes/');
         if(parts.length > 1) {
-          const filePath = parts[1].split('?')[0]; // Limpiar parámetros de URL si los hay
-          await supabase.storage.from('imagenes').remove([decodeURIComponent(filePath)]);
+          const filePath = parts[1].split('?')[0];
+          await supabaseClient.storage.from('imagenes').remove([decodeURIComponent(filePath)]);
         }
       } catch(e) { console.error(e); }
     }
 
     // ============== AUTENTICACIÓN ==============
     function checkAuth() {
-      supabase.auth.onAuthStateChange((event, session) => {
+      if(!supabaseClient) return;
+      supabaseClient.auth.onAuthStateChange((event, session) => {
         isLoggedIn = !!session;
         document.getElementById('navAdmin').querySelector('i').className = isLoggedIn ? 'fas fa-unlock' : 'fas fa-lock';
       });
     }
 
     async function handleLogin() {
+      if(!supabaseClient) { showToast('Error de conexión', 'error'); return; }
       const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPass').value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
       if(error) { document.getElementById('loginError').classList.remove('hidden'); console.error(error); }
       else { closeAllModals(); openAdmin(); showToast('Bienvenida', 'success'); }
     }
 
     async function handleLogout() { 
-      await supabase.auth.signOut(); 
+      if(supabaseClient) await supabaseClient.auth.signOut(); 
       isLoggedIn=false; 
       closeAllModals(); 
     }
@@ -338,7 +351,7 @@
       let logoUrl = storeData.logo_url;
       if(file) { logoUrl = await uploadImage(file); }
       
-      const { error } = await supabase.from('salon_info').update({
+      const { error } = await supabaseClient.from('salon_info').update({
         name: document.getElementById('ai_name').value,
         address: document.getElementById('ai_addr').value,
         phone: document.getElementById('ai_phone').value,
@@ -413,10 +426,10 @@
       const serviceData = { name, price, duration: duration||'60 min', description, image_url: imageUrl || 'https://picsum.photos/seed/s'+Date.now()+'/400/400', category };
 
       if (editId !== "") {
-        const { error } = await supabase.from('services').update(serviceData).eq('id', editId);
+        const { error } = await supabaseClient.from('services').update(serviceData).eq('id', editId);
         if(error) { showToast('Error al actualizar', 'error'); console.error(error); }
       } else {
-        const { error } = await supabase.from('services').insert(serviceData);
+        const { error } = await supabaseClient.from('services').insert(serviceData);
         if(error) { showToast('Error al crear', 'error'); console.error(error); }
       }
 
@@ -428,7 +441,7 @@
       if(!confirm('¿Eliminar este servicio?')) return; 
       const service = storeData.services.find(x => x.id === id);
       if(service) await deleteImage(service.image_url);
-      await supabase.from('services').delete().eq('id', id); 
+      await supabaseClient.from('services').delete().eq('id', id); 
       await fetchStoreData(); showAdminPage('services'); renderHome(); showToast('Eliminado', 'success');
     }
 
@@ -456,7 +469,7 @@
       showToast('Subiendo archivo...', 'info');
       const url = await uploadImage(file);
       if(url) {
-        const { error } = await supabase.from('gallery').insert({ url, type });
+        const { error } = await supabaseClient.from('gallery').insert({ url, type });
         if(!error) { await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('¡Agregado!', 'success'); }
         else { showToast('Error en BD', 'error'); console.error(error); }
       }
@@ -466,11 +479,11 @@
       if(!confirm('¿Eliminar de la galería?')) return; 
       const item = storeData.gallery.find(x => x.id === id);
       if(item) await deleteImage(item.url);
-      await supabase.from('gallery').delete().eq('id', id); 
+      await supabaseClient.from('gallery').delete().eq('id', id); 
       await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('Eliminado', 'success');
     }
 
     document.addEventListener('DOMContentLoaded', () => { initApp(); document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if(e.target===o) closeAllModals(); })); });
   </script>
 </body>
-    </html>
+                                                                                                                                                                                                              </html>
