@@ -84,9 +84,10 @@
         <button onclick="filterMainCategory('depilacion')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="depilacion"><i class="fas fa-bandage"></i> Depilación</button>
       </div>
 
+      <!-- ORDEN DE BOTONES CAMBIADO: PRIMERO EXTENSIONES NUEVAS -->
       <div id="subCatPestanas" class="flex gap-2 mb-2 pl-1 tabs-scroll">
-        <button onclick="filterSubCategory('pestanas_relleno', 'pestanas')" class="subcat-btn active px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_relleno">Relleno extensiones</button>
-        <button onclick="filterSubCategory('pestanas_nuevas', 'pestanas')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_nuevas">Extensiones nuevas</button>
+        <button onclick="filterSubCategory('pestanas_nuevas', 'pestanas')" class="subcat-btn active px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_nuevas">Extensiones nuevas</button>
+        <button onclick="filterSubCategory('pestanas_relleno', 'pestanas')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_relleno">Relleno extensiones</button>
       </div>
 
       <div id="subCatManicura" class="hidden flex gap-2 mb-2 pl-1 tabs-scroll">
@@ -115,7 +116,6 @@
     </section>
   </main>
 
-  <!-- PANTALLA DE TURNO MODIFICADA CON DÍA Y HORA -->
   <div id="screenBooking" class="pb-24 px-4 pt-6" style="display:none;">
     <h2 class="font-display text-2xl font-bold mb-4">Reservar Turno</h2>
     <div id="bookingEmpty" class="text-center py-12"><i class="fas fa-calendar-xmark text-4xl text-sand mb-3"></i><p class="text-drift text-sm">No has seleccionado servicios</p></div>
@@ -169,15 +169,15 @@
     let isLoggedIn = false, bookingCart = [];
     
     let currentMainCat = 'pestanas';
-    let currentPestanasSubCat = 'pestanas_relleno'; 
+    let currentPestanasSubCat = 'pestanas_nuevas'; 
     let currentManicuraSubCat = 'manicura_naturales';
-    let activeFilter = 'pestanas_relleno';
-    let adminActiveCat = 'pestanas_relleno';
+    let activeFilter = 'pestanas_nuevas';
+    let adminActiveCat = 'pestanas_nuevas';
     let homeSortType = 'alpha'; 
     let adminSortType = 'alpha';
 
     const catNames = { 
-      pestanas_relleno: "Pestañas - Relleno", pestanas_nuevas: "Pestañas - Nuevas", cejas: "Cejas",
+      pestanas_nuevas: "Pestañas - Nuevas", pestanas_relleno: "Pestañas - Relleno", cejas: "Cejas",
       manicura_naturales: "Manicura - Uñas naturales gel", manicura_softgel: "Manicura - Soft Gel", manicura_extension: "Manicura - Ext. Gel construcción",
       pedicura: "Pedicura", faciales: "Trat. Faciales", depilacion: "Depilación" 
     };
@@ -188,7 +188,7 @@
       renderHome(); 
       generateTimeSlots(); 
       renderGallery();
-      setupDatePicker(); // Inicializar calendario
+      setupDatePicker(); 
     }
 
     function setupDatePicker() {
@@ -341,7 +341,6 @@
       videos.forEach(video => observer.observe(video));
     }
 
-    // HORARIOS MODIFICADOS: Solo 12 PM, 2 PM y 4 PM
     function generateTimeSlots() { 
       const sel = document.getElementById('bookTime'); 
       sel.innerHTML = '<option value="">Horario disponible</option>';
@@ -372,7 +371,6 @@
             
       if(!name || !phone || !dateRaw || !time) { showToast('Completa todos los datos', 'error'); return; }
       
-      // Formatear fecha para que se vea bonita en WhatsApp (Ej: lunes, 15 de mayo)
       const dateObj = new Date(dateRaw + 'T00:00:00');
       const options = { weekday: 'long', day: 'numeric', month: 'long' };
       const formattedDate = dateObj.toLocaleDateString('es-ES', options);
@@ -442,7 +440,7 @@
 
     function filterAdminServices(catId) { adminActiveCat = catId; renderAdminServices(document.getElementById('adminContent')); }
 
-    function renderServiceForm(preselectedCat = 'pestanas_relleno', editId = null) {
+    function renderServiceForm(preselectedCat = 'pestanas_nuevas', editId = null) {
       const s = editId !== null ? storeData.services.find(x => x.id === editId) : {};
       const btnText = editId !== null ? 'Actualizar Servicio' : 'Guardar Servicio';
       let optionsHtml = '';
