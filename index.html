@@ -36,27 +36,28 @@
     .modal-overlay.visible { opacity: 1; pointer-events: all; }
     .modal-box { transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); width: 100%; max-height: 95vh; overflow-y: auto; border-radius: 24px 24px 0 0; background: #fff; }
     .modal-overlay.visible .modal-box { transform: translateY(0); }
-    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120%); background: #1A1A1A; color: #fff; padding: 12px 24px; border-radius: 50px; font-size: 14px; z-index: 2000; transition: transform 0.4s; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120%); background: #1A1A1A; color: #fff; padding: 14px 24px; border-radius: 16px; font-size: 13px; z-index: 2000; transition: transform 0.4s; max-width: 92vw; text-align: center; line-height: 1.4; }
     .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #991B1B; }
+    .toast.info { background: #1E3A5F; }
+    .toast.success { background: #14532D; }
     .admin-input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #374151; font-size: 15px; font-family: 'Lato', sans-serif; background: #1F2937; color: #f9fafb; }
     .admin-input:focus { outline: none; border-color: #D6336C; }
     .badge { position: absolute; top: -5px; right: -5px; background: #D6336C; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .tabs-scroll { overflow-x: auto; scrollbar-width: none; } .tabs-scroll::-webkit-scrollbar { display: none; }
-    
     #galleryGrid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 130px; gap: 6px; }
     #galleryGrid .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
     #galleryGrid .gallery-item { position: relative; border-radius: 12px; overflow: hidden; }
     #galleryGrid .gallery-item img, #galleryGrid .gallery-item video { width: 100%; height: 100%; object-fit: cover; }
     #galleryGrid .play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); color: white; font-size: 24px; pointer-events: none; transition: opacity 0.3s; }
     #galleryGrid .play-icon.hidden-play { opacity: 0; background: transparent; }
-    
     .cat-btn { transition: all 0.2s; border: 2px solid transparent; }
     .cat-btn.active { background: white; border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(214, 51, 108, 0.15); }
     .subcat-btn { transition: all 0.2s; border: 1.5px solid var(--accent); color: var(--accent); background: transparent; }
     .subcat-btn.active { background: var(--accent); color: white; }
     .sort-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-    /* ===== HERO CON FONDO DE SALÓN ===== */
+    /* ===== HERO ===== */
     .hero-wrapper {
       position: relative;
       overflow: hidden;
@@ -64,30 +65,19 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 1.5rem;
     }
     .hero-bg-zone {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 65%;
+      bottom: 0;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       z-index: 0;
     }
-    .hero-bg-zone::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(26,26,26,0.15) 0%,
-        rgba(26,26,26,0.5) 60%,
-        rgba(26,26,26,1) 100%
-      );
-    }
+    /* Sin difuminado — la imagen se ve completa */
     .hero-content {
       position: relative;
       z-index: 1;
@@ -95,8 +85,25 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      padding-top: 2.5rem;
-      padding-bottom: 2rem;
+      padding: 2.5rem 1.5rem 2rem;
+    }
+    /* Logo: círculo perfecto con la imagen ajustada */
+    .hero-logo-circle {
+      width: 9rem;
+      height: 9rem;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      background: rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      margin-bottom: 1rem;
+    }
+    .hero-logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .hero-text-zone {
       width: 100%;
@@ -118,11 +125,12 @@
   </nav>
 
   <main id="screenHome" class="pb-24">
-    <!-- HERO RECONSTRUIDO -->
     <div class="hero-wrapper" id="heroSection">
       <div class="hero-bg-zone" id="heroBg" style="display:none;"></div>
       <div class="hero-content">
-        <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo" class="w-36 h-36 object-contain rounded-full shadow-lg border-4 border-white/10 mb-4 bg-white/10 p-1 relative z-10">
+        <div class="hero-logo-circle">
+          <img id="heroLogo" src="https://raw.githubusercontent.com/ecosdemoda/Lashes-cat-logo-/main/Logo%20lashes.png" alt="Lashes Lashes Logo">
+        </div>
         <div class="hero-text-zone">
           <h1 id="salonTitle" class="font-display text-3xl font-black text-white leading-tight text-center drop-shadow-md"></h1>
           <div class="flex items-center gap-2 text-white/80 text-sm mt-2 drop-shadow-sm"><i class="fas fa-map-marker-alt"></i><span id="salonAddress"></span></div>
@@ -132,7 +140,6 @@
 
     <section class="px-4 py-6">
       <h2 class="font-display text-2xl font-bold mb-4">Servicios</h2>
-      
       <div class="flex gap-2 overflow-x-auto pb-3 tabs-scroll mb-2">
         <button onclick="filterMainCategory('pestanas')" class="cat-btn active flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="pestanas"><i class="fas fa-eye"></i> Pestañas</button>
         <button onclick="filterMainCategory('cejas')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="cejas"><i class="fas fa-face-grin-beam"></i> Cejas</button>
@@ -141,28 +148,23 @@
         <button onclick="filterMainCategory('faciales')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="faciales"><i class="fas fa-face-smile-beam"></i> Faciales</button>
         <button onclick="filterMainCategory('depilacion')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="depilacion"><i class="fas fa-bandage"></i> Depilación</button>
       </div>
-
       <div id="subCatPestanas" class="flex gap-2 mb-2 pl-1 tabs-scroll">
         <button onclick="filterSubCategory('pestanas_nuevas', 'pestanas')" class="subcat-btn active px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_nuevas">Extensiones nuevas</button>
         <button onclick="filterSubCategory('pestanas_relleno', 'pestanas')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_relleno">Relleno extensiones</button>
       </div>
-
       <div id="subCatManicura" class="hidden flex gap-2 mb-2 pl-1 tabs-scroll">
         <button onclick="filterSubCategory('manicura_naturales', 'manicura')" class="subcat-btn active px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="manicura_naturales">Uñas naturales gel</button>
         <button onclick="filterSubCategory('manicura_softgel', 'manicura')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="manicura_softgel">Uñas Soft Gel</button>
         <button onclick="filterSubCategory('manicura_extension', 'manicura')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="manicura_extension">Ext. Gel construcción</button>
       </div>
-
       <div id="notasManicura" class="hidden bg-white/70 border border-sand rounded-xl p-3 mb-3 text-xs text-charcoal space-y-2 shadow-sm">
         <p class="flex items-start gap-2"><i class="fas fa-star text-fuchsia mt-0.5"></i> <span>Los efectos y accesorios tendrán un costo de 500 MN. Si desea más de dos se le realizará un paquete más económico.</span></p>
         <p class="flex items-start gap-2"><i class="fas fa-check-double text-fuchsia mt-0.5"></i> <span>Todos los servicios incluyen manicura rusa y el color de su preferencia.</span></p>
       </div>
-
       <div class="flex justify-end gap-2 mb-4">
         <button onclick="setSort('alpha')" class="sort-btn active text-[11px] px-3 py-1 rounded-full border border-sand bg-white text-drift font-bold transition">A-Z</button>
         <button onclick="setSort('price')" class="sort-btn text-[11px] px-3 py-1 rounded-full border border-sand bg-white text-drift font-bold transition">Precio $</button>
       </div>
-
       <div id="servicesGrid" class="grid grid-cols-2 gap-3"></div>
     </section>
 
@@ -181,14 +183,8 @@
       <div id="bookingTotal" class="text-right font-bold text-xl mb-2"></div>
       <input type="text" id="bookName" placeholder="Tu nombre completo" class="admin-input border-sand bg-white text-charcoal">
       <input type="tel" id="bookPhone" placeholder="Tu teléfono" class="admin-input border-sand bg-white text-charcoal">
-      <div>
-        <label class="block text-[11px] text-drift mb-1 ml-1 font-bold">Selecciona el día</label>
-        <input type="date" id="bookDate" class="admin-input border-sand bg-white text-charcoal">
-      </div>
-      <div>
-        <label class="block text-[11px] text-drift mb-1 ml-1 font-bold">Selecciona la hora</label>
-        <select id="bookTime" class="admin-input border-sand bg-white text-charcoal"><option value="">Horario disponible</option></select>
-      </div>
+      <div><label class="block text-[11px] text-drift mb-1 ml-1 font-bold">Selecciona el día</label><input type="date" id="bookDate" class="admin-input border-sand bg-white text-charcoal"></div>
+      <div><label class="block text-[11px] text-drift mb-1 ml-1 font-bold">Selecciona la hora</label><select id="bookTime" class="admin-input border-sand bg-white text-charcoal"><option value="">Horario disponible</option></select></div>
       <button onclick="sendBooking()" class="w-full py-3 rounded-xl font-bold text-white text-base bg-green-600 active:scale-95 transition flex items-center justify-center gap-2"><i class="fab fa-whatsapp text-xl"></i> Reservar por WhatsApp</button>
     </div>
   </div>
@@ -217,7 +213,6 @@
 
     let storeData = { salonName: 'Lashes Lashes', address: 'La elegancia comienza por tu mirada', phone: '', logo_url: '', hero_bg_url: '', services: [], gallery: [] };
     let isLoggedIn = false, bookingCart = [];
-    
     let currentMainCat = 'pestanas';
     let currentPestanasSubCat = 'pestanas_nuevas'; 
     let currentManicuraSubCat = 'manicura_naturales';
@@ -225,21 +220,17 @@
     let adminActiveCat = 'pestanas_nuevas';
     let homeSortType = 'alpha'; 
     let adminSortType = 'alpha';
+    let heroBgColumnExists = true;
 
     const catNames = { 
       pestanas_nuevas: "Extensiones nuevas", pestanas_relleno: "Relleno de extensiones", cejas: "Cejas",
       manicura_naturales: "Uñas naturales gel", manicura_softgel: "Uñas Soft Gel", manicura_extension: "Extensión Gel construcción",
       pedicura: "Pedicura", faciales: "Trat. Faciales", depilacion: "Depilación" 
     };
-
     const catLabelsWA = {
-      pestanas_nuevas: "🏷️ Tipo: Extensiones nuevas",
-      pestanas_relleno: "🏷️ Tipo: Relleno de extensiones",
-      manicura_naturales: "🏷️ Tipo: Uñas naturales gel",
-      manicura_softgel: "🏷️ Tipo: Uñas Soft Gel",
-      manicura_extension: "🏷️ Tipo: Extensión Gel construcción"
+      pestanas_nuevas: "🏷️ Tipo: Extensiones nuevas", pestanas_relleno: "🏷️ Tipo: Relleno de extensiones",
+      manicura_naturales: "🏷️ Tipo: Uñas naturales gel", manicura_softgel: "🏷️ Tipo: Uñas Soft Gel", manicura_extension: "🏷️ Tipo: Extensión Gel construcción"
     };
-
     function getServiceTypeLabel(category) { return catLabelsWA[category] || ''; }
 
     async function initApp() {
@@ -266,7 +257,12 @@
           storeData.address = info.address; 
           storeData.phone = info.phone; 
           if(info.logo_url) storeData.logo_url = info.logo_url;
-          if(info.hero_bg_url) storeData.hero_bg_url = info.hero_bg_url;
+          if('hero_bg_url' in info) {
+            heroBgColumnExists = true;
+            if(info.hero_bg_url) storeData.hero_bg_url = info.hero_bg_url;
+          } else {
+            heroBgColumnExists = false;
+          }
         }
         
         const { data: servs, error: err2 } = await supabaseClient.from('services').select('*').order('name', { ascending: true });
@@ -320,12 +316,10 @@
 
     async function handleLogout() { if(supabaseClient) await supabaseClient.auth.signOut(); isLoggedIn=false; closeAllModals(); }
 
-    /* ===== RENDER HOME CON FONDO ===== */
     function renderHome() {
       document.getElementById('salonTitle').textContent = storeData.salonName || 'Lashes Lashes';
       document.getElementById('salonAddress').textContent = storeData.address || '';
       if(storeData.logo_url) document.getElementById('heroLogo').src = storeData.logo_url;
-
       const heroBg = document.getElementById('heroBg');
       if(storeData.hero_bg_url) {
         heroBg.style.backgroundImage = `url('${storeData.hero_bg_url}')`;
@@ -333,7 +327,6 @@
       } else {
         heroBg.style.display = 'none';
       }
-
       renderServices();
     }
 
@@ -358,7 +351,6 @@
 
     function setSort(type, origin) {
       if(origin === 'admin') adminSortType = type; else homeSortType = type;
-      document.querySelectorAll(`.sort-btn-${origin}`).forEach(b => b.classList.toggle('active', b.dataset.sort === type));
       if(origin === 'admin') renderAdminServices(document.getElementById('adminContent')); else renderServices();
     }
 
@@ -381,9 +373,7 @@
       if(!storeData.gallery || storeData.gallery.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
       empty.classList.add('hidden'); grid.innerHTML = '';
       storeData.gallery.forEach(item => {
-        if(item.type === 'video') {
-          grid.innerHTML += `<div class="gallery-item"><video src="${item.url}" loop muted playsinline class="gallery-video"></video><div class="play-icon"><i class="fas fa-play"></i></div></div>`;
-        }
+        if(item.type === 'video') grid.innerHTML += `<div class="gallery-item"><video src="${item.url}" loop muted playsinline class="gallery-video"></video><div class="play-icon"><i class="fas fa-play"></i></div></div>`;
         else grid.innerHTML += `<div class="gallery-item"><img src="${item.url}" alt="Trabajo realizado"></div>`;
       });
       setupVideoObservers();
@@ -394,28 +384,21 @@
       if(videos.length === 0) return;
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          const video = entry.target;
-          const playIcon = video.nextElementSibling; 
-          if (entry.isIntersecting) {
-            video.play().then(() => { if(playIcon) playIcon.classList.add('hidden-play'); }).catch(err => {});
-          } else {
-            video.pause();
-            if(playIcon) playIcon.classList.remove('hidden-play');
-          }
+          const video = entry.target; const playIcon = video.nextElementSibling; 
+          if (entry.isIntersecting) { video.play().then(() => { if(playIcon) playIcon.classList.add('hidden-play'); }).catch(() => {}); }
+          else { video.pause(); if(playIcon) playIcon.classList.remove('hidden-play'); }
         });
       }, { threshold: 0.5 });
       videos.forEach(video => observer.observe(video));
     }
 
     function generateTimeSlots() { 
-      const sel = document.getElementById('bookTime'); 
-      sel.innerHTML = '<option value="">Horario disponible</option>';
+      const sel = document.getElementById('bookTime'); sel.innerHTML = '<option value="">Horario disponible</option>';
       ['12:00 PM', '2:00 PM', '4:00 PM'].forEach(time => { sel.innerHTML += `<option value="${time}">${time}</option>`; });
     }
 
     function addService(id) { 
-      const s = storeData.services.find(x => x.id === id); 
-      if(!s) return; 
+      const s = storeData.services.find(x => x.id === id); if(!s) return; 
       const e = bookingCart.find(x => x.id === id); 
       if(e) e.qty++; 
       else bookingCart.push({id: s.id, name: s.name, price: s.price, description: s.description, category: s.category, qty: 1}); 
@@ -439,22 +422,12 @@
     }
 
     function sendBooking() {
-      const name = document.getElementById('bookName').value.trim(), 
-            phone = document.getElementById('bookPhone').value.trim(), 
-            dateRaw = document.getElementById('bookDate').value,
-            time = document.getElementById('bookTime').value;
+      const name = document.getElementById('bookName').value.trim(), phone = document.getElementById('bookPhone').value.trim(), dateRaw = document.getElementById('bookDate').value, time = document.getElementById('bookTime').value;
       if(!name || !phone || !dateRaw || !time) { showToast('Completa todos los datos', 'error'); return; }
-      const dateObj = new Date(dateRaw + 'T00:00:00');
-      const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+      const formattedDate = new Date(dateRaw + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
       let msg = `💅 *Reserva - ${storeData.salonName}*\n\n👤 *Cliente:* ${name}\n📞 *Teléfono:* ${phone}\n📅 *Día:* ${formattedDate}\n🕒 *Hora:* ${time}\n\n📋 *Servicios:*\n`;
       let total = 0;
-      bookingCart.forEach(i => { 
-        const sub = i.price * i.qty; total += sub; 
-        msg += `\n  • ${i.name} x${i.qty} - $${sub}\n`; 
-        const typeLabel = getServiceTypeLabel(i.category);
-        if(typeLabel) msg += `    ${typeLabel}\n`;
-        if(i.description) msg += `    ✔️ _${i.description}_\n`; 
-      });
+      bookingCart.forEach(i => { const sub = i.price * i.qty; total += sub; msg += `\n  • ${i.name} x${i.qty} - $${sub}\n`; const tl = getServiceTypeLabel(i.category); if(tl) msg += `    ${tl}\n`; if(i.description) msg += `    ✔️ _${i.description}_\n`; });
       msg += `\n💰 *Total: $${total}*`;
       window.open(`https://wa.me/${(storeData.phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
       bookingCart = []; updateBookingBadge(); renderBooking(); switchScreen('home');
@@ -465,52 +438,42 @@
     function openAdmin() { openModal('adminModal'); showAdminPage('info'); }
     function openModal(id) { document.getElementById(id).classList.add('visible'); }
     function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('visible')); }
-    let toastTimer; function showToast(m, t) { const e=document.getElementById('toast'); e.textContent=m; e.className='toast '+t; clearTimeout(toastTimer); setTimeout(()=>e.classList.add('show'),10); toastTimer=setTimeout(()=>e.classList.remove('show'),2500); }
+    let toastTimer; function showToast(m, t) { const e=document.getElementById('toast'); e.textContent=m; e.className='toast '+(t||''); clearTimeout(toastTimer); setTimeout(()=>e.classList.add('show'),10); toastTimer=setTimeout(()=>e.classList.remove('show'), t==='info'?6000:2500); }
 
     function showAdminPage(pg) { document.querySelectorAll('.admin-tab').forEach(b => { b.classList.toggle('bg-pink-900/30', b.dataset.page===pg); b.classList.toggle('text-pink-400', b.dataset.page===pg); b.classList.toggle('text-gray-300', b.dataset.page!==pg); }); const c = document.getElementById('adminContent'); if(pg==='info') renderAdminInfo(c); else if(pg==='services') renderAdminServices(c); else if(pg==='gallery') renderAdminGallery(c); }
 
-    /* ===== ADMIN INFO CON CAMPO DE FONDO ===== */
     function renderAdminInfo(el) {
       const hasHeroBg = storeData.hero_bg_url ? true : false;
+      const columnWarn = !heroBgColumnExists ? `
+        <div class="bg-yellow-900/30 border border-yellow-600/50 rounded-xl p-4 text-sm space-y-2">
+          <p class="font-bold text-yellow-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Falta una columna en la base de datos</p>
+          <p class="text-yellow-200/80 text-xs leading-relaxed">Para guardar la foto de fondo necesitás agregar la columna <code class="bg-black/30 px-1.5 py-0.5 rounded text-yellow-300">hero_bg_url</code> a tu tabla <code class="bg-black/30 px-1.5 py-0.5 rounded text-yellow-300">salon_info</code>.</p>
+          <p class="text-yellow-200/60 text-[11px]">Ve a Supabase → SQL Editor y ejecutá:</p>
+          <pre class="bg-black/50 rounded-lg p-3 text-[11px] text-green-400 overflow-x-auto mt-1">ALTER TABLE salon_info\nADD COLUMN hero_bg_url TEXT;</pre>
+        </div>` : '';
+
       el.innerHTML = `<div class="space-y-4">
         <h3 class="font-display font-bold text-pink-400">Información del Salón</h3>
-        
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">Nombre</label>
-          <input id="ai_name" value="${storeData.salonName||''}" class="admin-input">
-        </div>
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">Dirección / Slogan</label>
-          <input id="ai_addr" value="${storeData.address||''}" class="admin-input">
-        </div>
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">WhatsApp (solo números)</label>
-          <input id="ai_phone" value="${storeData.phone||''}" class="admin-input">
-        </div>
-        
+        ${columnWarn}
+        <div><label class="block text-xs text-gray-400 mb-1">Nombre</label><input id="ai_name" value="${storeData.salonName||''}" class="admin-input"></div>
+        <div><label class="block text-xs text-gray-400 mb-1">Dirección / Slogan</label><input id="ai_addr" value="${storeData.address||''}" class="admin-input"></div>
+        <div><label class="block text-xs text-gray-400 mb-1">WhatsApp (solo números)</label><input id="ai_phone" value="${storeData.phone||''}" class="admin-input"></div>
         <div class="border border-gray-700 rounded-xl p-4 space-y-3">
           <h4 class="text-sm font-bold text-pink-400 flex items-center gap-2"><i class="fas fa-image"></i> Logo del salón</h4>
           <input type="file" id="ai_file" accept="image/*" class="admin-input text-xs">
           ${storeData.logo_url ? '<img src="'+storeData.logo_url+'" class="w-16 h-16 mt-1 rounded-lg object-cover border border-gray-600">' : '<p class="text-gray-500 text-xs">No hay logo cargado</p>'}
         </div>
-
-        <div class="border border-gray-700 rounded-xl p-4 space-y-3">
+        <div class="border border-gray-700 rounded-xl p-4 space-y-3 ${!heroBgColumnExists ? 'opacity-50 pointer-events-none' : ''}">
           <h4 class="text-sm font-bold text-pink-400 flex items-center gap-2"><i class="fas fa-panorama"></i> Foto de fondo del inicio</h4>
-          <p class="text-[11px] text-gray-400">Esta imagen se muestra detrás del logo en la página principal. La zona del nombre y dirección queda limpia sin imagen.</p>
-          <input type="file" id="ai_herobg" accept="image/*" class="admin-input text-xs">
-          ${hasHeroBg ? `
-            <div class="relative mt-1">
-              <img src="${storeData.hero_bg_url}" class="w-full h-40 rounded-lg object-cover border border-gray-600">
-              <button type="button" onclick="removeHeroBg()" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-full font-bold transition"><i class="fas fa-trash mr-1"></i>Quitar</button>
-            </div>
-          ` : '<p class="text-gray-500 text-xs">No hay imagen de fondo</p>'}
+          <p class="text-[11px] text-gray-400">Se muestra detrás del logo como fondo completo.</p>
+          ${!heroBgColumnExists ? '<p class="text-yellow-400 text-xs font-bold"><i class="fas fa-lock mr-1"></i> Primero agregá la columna (ver arriba)</p>' : ''}
+          <input type="file" id="ai_herobg" accept="image/*" class="admin-input text-xs" ${!heroBgColumnExists ? 'disabled' : ''}>
+          ${hasHeroBg ? `<div class="relative mt-1"><img src="${storeData.hero_bg_url}" class="w-full h-40 rounded-lg object-cover border border-gray-600"><button type="button" onclick="removeHeroBg()" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-full font-bold transition"><i class="fas fa-trash mr-1"></i>Quitar</button></div>` : '<p class="text-gray-500 text-xs">No hay imagen de fondo</p>'}
         </div>
-
         <button onclick="saveAdminInfo()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">Guardar todo</button>
       </div>`;
     }
 
-    /* Quitar solo la imagen de fondo sin guardar el resto */
     function removeHeroBg() {
       storeData.hero_bg_url = '';
       renderAdminInfo(document.getElementById('adminContent'));
@@ -518,36 +481,36 @@
 
     async function saveAdminInfo() {
       showToast('Guardando...', 'info');
-      
       const logoFile = document.getElementById('ai_file').files[0];
-      const heroBgFile = document.getElementById('ai_herobg').files[0];
-      
+      const heroBgFile = document.getElementById('ai_herobg') && document.getElementById('ai_herobg').files[0];
       let logoUrl = storeData.logo_url;
       let heroBgUrl = storeData.hero_bg_url;
+      if(logoFile) { logoUrl = await uploadImage(logoFile); if(!logoUrl) { showToast('Error al subir el logo', 'error'); return; } }
+      if(heroBgFile && heroBgColumnExists) { heroBgUrl = await uploadImage(heroBgFile); if(!heroBgUrl) { showToast('Error al subir el fondo', 'error'); return; } }
 
-      /* Subir logo si seleccionó nuevo */
-      if(logoFile) { logoUrl = await uploadImage(logoFile); }
-
-      /* Subir fondo si seleccionó nuevo */
-      if(heroBgFile) { heroBgUrl = await uploadImage(heroBgFile); }
-
-      const { error } = await supabaseClient.from('salon_info').update({
+      const baseData = {
         name: document.getElementById('ai_name').value,
         address: document.getElementById('ai_addr').value,
         phone: document.getElementById('ai_phone').value,
-        logo_url: logoUrl,
-        hero_bg_url: heroBgUrl || null
-      }).eq('id', 1);
+        logo_url: logoUrl
+      };
 
-      if(!error) { 
-        await fetchStoreData(); 
-        renderHome(); 
-        showAdminPage('info'); 
-        showToast('¡Guardado!', 'success'); 
-      } else { 
-        showToast('Error al guardar', 'error'); 
-        console.error(error); 
+      if(heroBgColumnExists) {
+        const fullData = { ...baseData, hero_bg_url: heroBgUrl || null };
+        const { error } = await supabaseClient.from('salon_info').update(fullData).eq('id', 1);
+        if(!error) { await fetchStoreData(); renderHome(); showAdminPage('info'); showToast('¡Todo guardado!', 'success'); return; }
+        const errMsg = (error.message || '').toLowerCase();
+        if(errMsg.includes('column') || errMsg.includes('does not exist') || errMsg.includes('relation') || errMsg.includes('unknown column')) {
+          heroBgColumnExists = false;
+          const { error: err2 } = await supabaseClient.from('salon_info').update(baseData).eq('id', 1);
+          if(!err2) { storeData.hero_bg_url = heroBgUrl; renderHome(); showAdminPage('info'); showToast('Nombre y logo guardados. El fondo necesita la columna hero_bg_url (mirá arriba).', 'info'); return; }
+        }
+        showToast('Error: ' + (error.message || 'desconocido'), 'error'); console.error(error); return;
       }
+
+      const { error } = await supabaseClient.from('salon_info').update(baseData).eq('id', 1);
+      if(!error) { storeData.hero_bg_url = heroBgUrl; renderHome(); showAdminPage('info'); showToast('Guardado. Agregá la columna hero_bg_url (mirá arriba).', 'info'); }
+      else { showToast('Error: ' + (error.message || 'desconocido'), 'error'); console.error(error); }
     }
 
     function renderAdminServices(el) {
@@ -557,7 +520,7 @@
         tabsHtml += `<button onclick="filterAdminServices('${key}')" class="px-3 py-1.5 rounded-lg text-xs font-bold shrink-nowrap border ${isActive} whitespace-nowrap">${catNames[key]}</button>`;
       });
       tabsHtml += '</div>';
-      let sortHtml = `<div class="flex justify-end gap-2 mb-4"><button onclick="setSort('alpha', 'admin')" class="sort-btn-admin text-[11px] px-3 py-1 rounded-full border ${adminSortType==='alpha' ? 'border-pink-400 bg-pink-900/50 text-pink-400' : 'border-gray-600 bg-adminCard text-gray-300'} font-bold transition" data-sort="alpha">A-Z</button><button onclick="setSort('price', 'admin')" class="sort-btn-admin text-[11px] px-3 py-1 rounded-full border ${adminSortType==='price' ? 'border-pink-400 bg-pink-900/50 text-pink-400' : 'border-gray-600 bg-adminCard text-gray-300'} font-bold transition" data-sort="price">Precio $</button></div>`;
+      let sortHtml = `<div class="flex justify-end gap-2 mb-4"><button onclick="setSort('alpha', 'admin')" class="text-[11px] px-3 py-1 rounded-full border ${adminSortType==='alpha' ? 'border-pink-400 bg-pink-900/50 text-pink-400' : 'border-gray-600 bg-adminCard text-gray-300'} font-bold transition">A-Z</button><button onclick="setSort('price', 'admin')" class="text-[11px] px-3 py-1 rounded-full border ${adminSortType==='price' ? 'border-pink-400 bg-pink-900/50 text-pink-400' : 'border-gray-600 bg-adminCard text-gray-300'} font-bold transition">Precio $</button></div>`;
       let filtered = storeData.services.filter(s => s.category === adminActiveCat);
       filtered = sortArray(filtered, adminSortType);
       let listHtml = '<div class="space-y-3">';
@@ -577,7 +540,6 @@
 
     function renderServiceForm(preselectedCat = 'pestanas_nuevas', editId = null) {
       const s = editId !== null ? storeData.services.find(x => x.id === editId) : {};
-      const btnText = editId !== null ? 'Actualizar Servicio' : 'Guardar Servicio';
       let optionsHtml = '';
       Object.keys(catNames).forEach(key => { const selected = key === (s.category || preselectedCat) ? 'selected' : ''; optionsHtml += `<option value="${key}" ${selected}>${catNames[key]}</option>`; });
       document.getElementById('adminContent').innerHTML = `
@@ -589,9 +551,9 @@
           <input id="sv_price" type="number" placeholder="Precio" class="admin-input" value="${s.price || ''}">
           <input id="sv_dur" placeholder="Duración (Ej: 45 min)" class="admin-input" value="${s.duration || ''}">
           <select id="sv_cat" class="admin-input">${optionsHtml}</select>
-          <textarea id="sv_desc" placeholder="¿Qué incluye? (Ej: Esmalte tradicional, limado, cutícula)" class="admin-input" rows="3">${s.description || ''}</textarea>
-          <div><label class="block text-xs text-gray-400 mb-1">Imagen (Seleccionar archivo)</label><input type="file" id="sv_file" accept="image/*" class="admin-input text-xs">${s.image_url ? '<img src="'+s.image_url+'" class="w-16 h-16 mt-2 rounded-lg object-cover">' : ''}</div>
-          <button onclick="saveService()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">${btnText}</button>
+          <textarea id="sv_desc" placeholder="¿Qué incluye?" class="admin-input" rows="3">${s.description || ''}</textarea>
+          <div><label class="block text-xs text-gray-400 mb-1">Imagen</label><input type="file" id="sv_file" accept="image/*" class="admin-input text-xs">${s.image_url ? '<img src="'+s.image_url+'" class="w-16 h-16 mt-2 rounded-lg object-cover">' : ''}</div>
+          <button onclick="saveService()" class="w-full py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)">${editId !== null ? 'Actualizar' : 'Guardar'} Servicio</button>
         </div>`;
     }
 
@@ -605,22 +567,16 @@
       showToast('Guardando...', 'info');
       let imageUrl = editId ? (storeData.services.find(x=>x.id==editId)||{}).image_url : '';
       if(file) { imageUrl = await uploadImage(file); }
-      const serviceData = { name, price, duration: duration||'60 min', description, image_url: imageUrl || 'https://picsum.photos/seed/s'+Date.now()+'/400/400', category };
-      if (editId !== "") {
-        const { error } = await supabaseClient.from('services').update(serviceData).eq('id', editId);
-        if(error) { showToast('Error al actualizar', 'error'); console.error(error); }
-      } else {
-        const { error } = await supabaseClient.from('services').insert(serviceData);
-        if(error) { showToast('Error al crear', 'error'); console.error(error); }
-      }
+      const d = { name, price, duration: duration||'60 min', description, image_url: imageUrl || 'https://picsum.photos/seed/s'+Date.now()+'/400/400', category };
+      const { error } = editId !== "" ? await supabaseClient.from('services').update(d).eq('id', editId) : await supabaseClient.from('services').insert(d);
+      if(error) { showToast('Error: ' + error.message, 'error'); console.error(error); return; }
       adminActiveCat = category;
       await fetchStoreData(); showAdminPage('services'); renderHome(); showToast('¡Éxito!', 'success');
     }
     
     async function deleteService(id) { 
       if(!confirm('¿Eliminar este servicio?')) return; 
-      const service = storeData.services.find(x => x.id === id);
-      if(service) await deleteImage(service.image_url);
+      const s = storeData.services.find(x => x.id === id); if(s) await deleteImage(s.image_url);
       await supabaseClient.from('services').delete().eq('id', id); 
       await fetchStoreData(); showAdminPage('services'); renderHome(); showToast('Eliminado', 'success');
     }
@@ -629,10 +585,8 @@
       let h = '<h3 class="font-display font-bold text-pink-400 mb-4">Galería de Trabajos</h3><div class="space-y-3">';
       if(storeData.gallery && storeData.gallery.length > 0) {
         storeData.gallery.forEach(item => {
-          const displayName = item.name || 'Archivo sin nombre'; 
-          const icon = item.type === 'video' ? 'fa-video' : 'fa-image';
-          const preview = item.type === 'video' ? `<div class="w-20 h-20 rounded-lg bg-adminCard flex items-center justify-center shrink-0"><i class="fas ${icon} text-pink-400 text-2xl"></i></div>` : `<img src="${item.url}" class="w-20 h-20 rounded-lg object-cover shrink-0">`;
-          h += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3 items-center">${preview}<div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-white truncate">${displayName}</p><p class="text-[10px] text-gray-500 uppercase">${item.type}</p></div><button onclick="deleteGalleryItem(${item.id})" class="text-red-400 text-lg p-2 shrink-0 hover:bg-red-900/30 rounded-lg"><i class="fas fa-trash"></i></button></div>`;
+          const preview = item.type === 'video' ? `<div class="w-20 h-20 rounded-lg bg-adminCard flex items-center justify-center shrink-0"><i class="fas fa-video text-pink-400 text-2xl"></i></div>` : `<img src="${item.url}" class="w-20 h-20 rounded-lg object-cover shrink-0">`;
+          h += `<div class="bg-adminCard p-3 rounded-xl border border-gray-700 flex gap-3 items-center">${preview}<div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-white truncate">${item.name||'Sin nombre'}</p><p class="text-[10px] text-gray-500 uppercase">${item.type}</p></div><button onclick="deleteGalleryItem(${item.id})" class="text-red-400 text-lg p-2 shrink-0 hover:bg-red-900/30 rounded-lg"><i class="fas fa-trash"></i></button></div>`;
         });
       }
       h += `</div><button onclick="renderGalleryForm()" class="w-full mt-4 py-3 rounded-xl font-bold text-white text-sm" style="background:var(--accent)"><i class="fas fa-plus mr-1"></i> Agregar Foto/Video</button>`;
@@ -646,19 +600,18 @@
     async function saveGalleryItem() {
       const file = document.getElementById('gal_file').files[0]; const type = document.getElementById('gal_type').value;
       if(!file) { showToast('Selecciona un archivo', 'error'); return; }
-      showToast('Subiendo archivo...', 'info');
+      showToast('Subiendo...', 'info');
       const url = await uploadImage(file);
       if(url) {
         const { error } = await supabaseClient.from('gallery').insert({ url, type, name: file.name });
         if(!error) { await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('¡Agregado!', 'success'); }
-        else { showToast('Error en BD', 'error'); console.error(error); }
+        else { showToast('Error: ' + error.message, 'error'); }
       }
     }
 
     async function deleteGalleryItem(id) { 
       if(!confirm('¿Eliminar de la galería?')) return; 
-      const item = storeData.gallery.find(x => x.id === id);
-      if(item) await deleteImage(item.url);
+      const item = storeData.gallery.find(x => x.id === id); if(item) await deleteImage(item.url);
       await supabaseClient.from('gallery').delete().eq('id', id); 
       await fetchStoreData(); showAdminPage('gallery'); renderGallery(); showToast('Eliminado', 'success');
     }
