@@ -84,7 +84,6 @@
         <button onclick="filterMainCategory('depilacion')" class="cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-sand text-charcoal shrink-0" data-cat="depilacion"><i class="fas fa-bandage"></i> Depilación</button>
       </div>
 
-      <!-- ORDEN DE BOTONES CAMBIADO: PRIMERO EXTENSIONES NUEVAS -->
       <div id="subCatPestanas" class="flex gap-2 mb-2 pl-1 tabs-scroll">
         <button onclick="filterSubCategory('pestanas_nuevas', 'pestanas')" class="subcat-btn active px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_nuevas">Extensiones nuevas</button>
         <button onclick="filterSubCategory('pestanas_relleno', 'pestanas')" class="subcat-btn px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap" data-subcat="pestanas_relleno">Relleno extensiones</button>
@@ -177,10 +176,24 @@
     let adminSortType = 'alpha';
 
     const catNames = { 
-      pestanas_nuevas: "Pestañas - Nuevas", pestanas_relleno: "Pestañas - Relleno", cejas: "Cejas",
-      manicura_naturales: "Manicura - Uñas naturales gel", manicura_softgel: "Manicura - Soft Gel", manicura_extension: "Manicura - Ext. Gel construcción",
+      pestanas_nuevas: "Extensiones nuevas", pestanas_relleno: "Relleno de extensiones", cejas: "Cejas",
+      manicura_naturales: "Uñas naturales gel", manicura_softgel: "Uñas Soft Gel", manicura_extension: "Extensión Gel construcción",
       pedicura: "Pedicura", faciales: "Trat. Faciales", depilacion: "Depilación" 
     };
+
+    /* Etiquetas cortas para el WhatsApp */
+    const catLabelsWA = {
+      pestanas_nuevas: "🏷️ Tipo: Extensiones nuevas",
+      pestanas_relleno: "🏷️ Tipo: Relleno de extensiones",
+      manicura_naturales: "🏷️ Tipo: Uñas naturales gel",
+      manicura_softgel: "🏷️ Tipo: Uñas Soft Gel",
+      manicura_extension: "🏷️ Tipo: Extensión Gel construcción"
+    };
+
+    /* Devuelve la etiqueta de tipo solo para categorías que tienen subcategoría */
+    function getServiceTypeLabel(category) {
+      return catLabelsWA[category] || '';
+    }
 
     async function initApp() {
       checkAuth();
@@ -344,14 +357,22 @@
     function generateTimeSlots() { 
       const sel = document.getElementById('bookTime'); 
       sel.innerHTML = '<option value="">Horario disponible</option>';
-      
       const fixedSlots = ['12:00 PM', '2:00 PM', '4:00 PM'];
       fixedSlots.forEach(time => {
         sel.innerHTML += `<option value="${time}">${time}</option>`;
       });
     }
 
-    function addService(id) { const s = storeData.services.find(x => x.id === id); if(!s) return; const e = bookingCart.find(x => x.id === id); if(e) e.qty++; else bookingCart.push({id: s.id, name: s.name, price: s.price, description: s.description, qty: 1}); updateBookingBadge(); showToast('Servicio añadido', 'success'); }
+    /* ===== CARRITO CON CATEGORÍA ===== */
+    function addService(id) { 
+      const s = storeData.services.find(x => x.id === id); 
+      if(!s) return; 
+      const e = bookingCart.find(x => x.id === id); 
+      if(e) e.qty++; 
+      else bookingCart.push({id: s.id, name: s.name, price: s.price, description: s.description, category: s.category, qty: 1}); 
+      updateBookingBadge(); 
+      showToast('Servicio añadido', 'success'); 
+    }
     function removeService(id) { bookingCart = bookingCart.filter(x => x.id !== id); updateBookingBadge(); renderBooking(); }
     function updateBookingBadge() { const t = bookingCart.reduce((s,i)=>s+i.qty,0); const b = document.getElementById('bookingBadge'); if(t>0){b.textContent=t;b.classList.remove('hidden');}else b.classList.add('hidden'); }
 
@@ -359,7 +380,15 @@
       const list = document.getElementById('bookingList'), form = document.getElementById('bookingForm'), empty = document.getElementById('bookingEmpty');
       if(bookingCart.length===0){ list.style.display='none'; form.style.display='none'; empty.style.display='block'; return; }
       empty.style.display='none'; list.style.display='block'; form.style.display='block'; list.innerHTML=''; let total=0;
-      bookingCart.forEach(i => { total+=i.price*i.qty; const descHtml = i.description ? `<p class="text-[10px] text-drift"><i class="fas fa-check-circle mr-1"></i>${i.description}</p>` : ''; list.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm"><div class="flex-1 mr-2"><h4 class="font-bold text-sm">${i.name}</h4>${descHtml}<p class="text-xs mt-1" style="color:var(--accent)">$${i.price} x ${i.qty}</p></div><div class="flex items-center gap-2"><button onclick="removeService(${i.id})" class="text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`; });
+      bookingCart.forEach(i => { 
+        total+=i.price*i.qty; 
+        const descHtml = i.description ? `<p class="text-[10px] text-drift"><i class="fas fa-check-circle mr-1"></i>${i.description}</p>` : '';
+        /* Mostrar tipo de servicio si tiene subcategoría */
+        const typeHtml = catNames[i.category] && !['cejas','pedicura','faciales','depilacion'].includes(i.category)
+          ? `<p class="text-[10px] font-bold" style="color:var(--accent)"><i class="fas fa-tag mr-1"></i>${catNames[i.category]}</p>` 
+          : '';
+        list.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm"><div class="flex-1 mr-2"><h4 class="font-bold text-sm">${i.name}</h4>${typeHtml}${descHtml}<p class="text-xs mt-1" style="color:var(--accent)">$${i.price} x ${i.qty}</p></div><div class="flex items-center gap-2"><button onclick="removeService(${i.id})" class="text-red-400"><i class="fas fa-trash text-xs"></i></button></div></div>`; 
+      });
       document.getElementById('bookingTotal').innerHTML = `<span class="text-drift text-sm">Total:</span> <span style="color:var(--accent)">$${total}</span>`;
     }
 
@@ -377,7 +406,16 @@
       
       let msg = `💅 *Reserva - ${storeData.salonName}*\n\n👤 *Cliente:* ${name}\n📞 *Teléfono:* ${phone}\n📅 *Día:* ${formattedDate}\n🕒 *Hora:* ${time}\n\n📋 *Servicios:*\n`;
       let total = 0;
-      bookingCart.forEach(i => { const sub = i.price * i.qty; total += sub; msg += `  • ${i.name} x${i.qty} - $${sub}\n`; if(i.description) msg += `    ✔️ _${i.description}_\n`; });
+      bookingCart.forEach(i => { 
+        const sub = i.price * i.qty; 
+        total += sub; 
+        msg += `\n  • ${i.name} x${i.qty} - $${sub}\n`; 
+        /* Tipo de servicio: nuevo/relleno en pestañas, tipo de uña en manicura */
+        const typeLabel = getServiceTypeLabel(i.category);
+        if(typeLabel) msg += `    ${typeLabel}\n`;
+        /* Descripción del servicio */
+        if(i.description) msg += `    ✔️ _${i.description}_\n`; 
+      });
       msg += `\n💰 *Total: $${total}*`;
       window.open(`https://wa.me/${(storeData.phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
       bookingCart = []; updateBookingBadge(); renderBooking(); switchScreen('home');
